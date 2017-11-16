@@ -1,7 +1,8 @@
 <?php
-
 /**
- * Utility functions for common functionality.
+ * Utility functions for dealing with URLs.
+ *
+ * @package hm-redirects
  */
 
 namespace HM\Redirects\Utilities;

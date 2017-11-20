@@ -7,6 +7,7 @@
 
 namespace HM\Redirects\Admin_UI;
 
+use HM\Redirects\Handle_Redirects;
 use HM\Redirects\Post_Type as Redirects_Post_Type;
 use HM\Redirects\Utilities;
 use WP_Post;
@@ -59,19 +60,19 @@ function output_meta_box( WP_Post $post ) {
 	}
 	?>
 	<p>
-		<label for="hm_redirect_from_url">From URL</label><br>
-		<input type="text" name="hm_redirect_from_url" id="hm_redirect_from_url" value="<?php echo esc_attr( $from_url ); ?>" class="regular-text code"/>
+		<label for="hm_redirects_from_url">From URL</label><br>
+		<input type="text" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $from_url ); ?>" class="regular-text code"/>
 	</p>
 	<p class="description">This path should be relative to the root of the site.</p>
 
 	<p>
-		<label for="hm_redirect_to_url">To URL</label><br>
-		<input type="text" name="hm_redirect_to_url" id="hm_redirect_to_url" value="<?php echo esc_attr( $to_url ); ?>" class="regular-text code"/>
+		<label for="hm_redirects_to_url">To URL</label><br>
+		<input type="text" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $to_url ); ?>" class="regular-text code"/>
 	</p>
 
 	<p>
-		<label for="hm_redirect_rule_status_code">HTTP Status Code:</label>
-		<select name="hm_redirect_rule_status_code" id="hm_redirect_rule_status_code">
+		<label for="hm_redirects_rule_status_code">HTTP Status Code:</label>
+		<select name="hm_redirects_rule_status_code" id="hm_redirects_rule_status_code">
 			<?php foreach ( $valid_status_codes as $code ) : ?>
 				<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $status_code_labels[ $code ] ); ?></option>
 			<?php endforeach; ?>
@@ -81,7 +82,7 @@ function output_meta_box( WP_Post $post ) {
 
 	<?php
 
-	wp_nonce_field( 'hm_redirect_meta', 'hm_redirect_meta_nonce' );
+	wp_nonce_field( 'hm_redirects_meta', 'hm_redirects_meta_nonce' );
 }
 
 
@@ -93,20 +94,20 @@ function output_meta_box( WP_Post $post ) {
  * @param bool    $update  Whether this is an existing post being updated or not.
  */
 function save_meta( $post_id, $post, $update ) {
-	if ( ! user_can_save( $post_id, 'hm_redirect_meta_nonce', 'hm_redirect_meta' ) ) {
+	if ( ! user_can_save( $post_id, 'hm_redirects_meta_nonce', 'hm_redirects_meta' ) ) {
 		return;
 	}
 
-	$from_url = format_path( wp_unslash( $_POST['hm_redirect_from_url'] ) );
+	$from_url = format_path( wp_unslash( $_POST['hm_redirects_from_url'] ) );
 	// $to_url can be a path or a full URL.
-	$to_url      = wp_unslash( $_POST['hm_redirect_to_url'] );
+	$to_url      = wp_unslash( $_POST['hm_redirects_to_url'] );
 	$is_full_url = filter_var( $to_url, FILTER_VALIDATE_URL );
 	$is_url      = filter_var( $to_url, FILTER_VALIDATE_URL, ~FILTER_FLAG_SCHEME_REQUIRED );
 	if ( ! $is_full_url && ! $is_url ) {
 		$to_url = format_path( $to_url );
 	}
 	$error       = validate_meta( $from_url, $to_url, $update );
-	$status_code = wp_unslash( $_POST['hm_redirect_rule_status_code'] );
+	$status_code = wp_unslash( $_POST['hm_redirects_rule_status_code'] );
 
 	if ( strlen( $error ) === 0 ) {
 		$from_url_hash = Utilities\get_url_hash( $from_url );
@@ -190,7 +191,7 @@ function validate_meta( $from_url, $to_url ) {
 	}
 
 	// From URL must be unique. Multiple URLs can redirect to the same target URL.
-	$redirect_post = Utilities\get_redirect_post( $from_url );
+	$redirect_post = Handle_Redirects\get_redirect_post( $from_url );
 	$post_ID       = (int) filter_input( INPUT_POST, 'post_ID' );
 	if ( $redirect_post && $post_ID !== $redirect_post->ID ) {
 		return 'A redirect rule for this URL already exists.';

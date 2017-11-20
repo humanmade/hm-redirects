@@ -51,9 +51,9 @@ function mb_callback( WP_Post $post ) {
 		404 => 'Not Found',
 	];
 
-	$from_url    = get_post_meta( $post->ID, '_hm_redirect_from_url', true );
-	$to_url      = get_post_meta( $post->ID, '_hm_redirect_to_url', true );
-	$status_code = get_post_meta( $post->ID, '_hm_redirect_rule_status_code', true );
+	$from_url    = get_post_meta( $post->ID, 'hm_redirects_from_url', true );
+	$to_url      = get_post_meta( $post->ID, 'hm_redirects_to_url', true );
+	$status_code = get_post_meta( $post->ID, 'hm_redirects_rule_status_code', true );
 	if ( empty( $status_code ) ) {
 		$status_code = 302;
 	}
@@ -110,10 +110,10 @@ function save_meta( $post_id, $post, $update ) {
 
 	if ( strlen( $error ) === 0 ) {
 		$from_url_hash = Utilities\get_url_hash( $from_url );
-		update_post_meta( $post_id, '_hm_redirect_from_url', sanitize_text_field( $from_url ) );
-		update_post_meta( $post_id, '_hm_redirect_to_url', sanitize_text_field( $to_url ) );
+		update_post_meta( $post_id, 'hm_redirects_from_url', sanitize_text_field( $from_url ) );
+		update_post_meta( $post_id, 'hm_redirects_to_url', sanitize_text_field( $to_url ) );
 
-		update_post_meta( $post_id, '_hm_redirect_rule_status_code', sanitize_text_field( $status_code ) );
+		update_post_meta( $post_id, 'hm_redirects_rule_status_code', sanitize_text_field( $status_code ) );
 
 		remove_action( 'save_post', __NAMESPACE__ . '\\save_meta', 13 );
 		wp_update_post(

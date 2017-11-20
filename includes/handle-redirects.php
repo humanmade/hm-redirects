@@ -7,6 +7,7 @@
 
 namespace HM\Redirects\Handle_Redirects;
 
+use HM\Redirects\Post_Type as Redirects_Post_Type;
 use HM\Redirects\Utilities;
 use WP_Error;
 use WP_Query;

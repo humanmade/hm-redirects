@@ -28,7 +28,7 @@ function add_meta_box() {
 	\add_meta_box(
 		'hm-redirects-meta',
 		'Redirect Settings',
-		__NAMESPACE__ . '\\mb_callback',
+		__NAMESPACE__ . '\\output_meta_box',
 		Redirects_Post_Type\SLUG,
 		'normal',
 		'high'
@@ -40,7 +40,7 @@ function add_meta_box() {
  *
  * @param WP_Post $post The currently edited post.
  */
-function mb_callback( WP_Post $post ) {
+function output_meta_box( WP_Post $post ) {
 	$valid_status_codes = [ 301, 302, 303, 307, 403, 404 ];
 	$status_code_labels = [
 		301 => 'Moved Permanently',

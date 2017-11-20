@@ -165,12 +165,12 @@ function format_path( $path ) {
  * @return string
  */
 function validate_meta( $from_url, $to_url ) {
-	if ( is_wp_error( Utilities\normalise_url( $from_url ) ) ) {
-		return 'Invalid FROM value';
-	}
-
 	if ( empty( $from_url ) || empty( $to_url ) ) {
 		return 'Fields are required';
+	}
+
+	if ( is_wp_error( Utilities\normalise_url( $from_url ) ) ) {
+		return 'Invalid FROM value';
 	}
 
 	if ( false === filter_var( Utilities\prefix_path( $from_url ), FILTER_VALIDATE_URL ) ) {

@@ -2,8 +2,7 @@
 /**
  * Adds a user interface for defining redirects.
  *
- * @package hm_Redirects_Plugin
- * @author Human Made Limited
+ * @package hm-redirects
  */
 
 namespace HM\Redirects\Admin_UI;
@@ -23,7 +22,7 @@ function setup() {
 
 
 /**
- * Add the UI for the redirect URLs.
+ * Add the metabox for the redirects.
  */
 function add_meta_box() {
 	\add_meta_box(
@@ -37,9 +36,9 @@ function add_meta_box() {
 }
 
 /**
- * Displays the fields.
+ * Output the redirects metabox,
  *
- * @param WP_Post $post An instance of the post being saved.
+ * @param WP_Post $post The currently edited post.
  */
 function mb_callback( WP_Post $post ) {
 	$valid_status_codes = [ 301, 302, 303, 307, 403, 404 ];
@@ -87,11 +86,11 @@ function mb_callback( WP_Post $post ) {
 
 
 /**
- * Saves the redirect data to the posts meta.
+ * Save the redirects data.
  *
- * @param int     $post_id ID of the post.
- * @param WP_Post $post Instance of the post object being saved.
- * @param bool    $update Whether or not this is a new post or an update.
+ * @param int     $post_id Saved post id.
+ * @param WP_Post $post    Saved post object.
+ * @param bool    $update  Whether this is an existing post being updated or not.
  */
 function save_meta( $post_id, $post, $update ) {
 	if ( ! user_can_save( $post_id, 'hm_redirect_meta_nonce', 'hm_redirect_meta' ) ) {
@@ -201,7 +200,9 @@ function validate_meta( $from_url, $to_url ) {
 }
 
 /**
- * Save the error message.
+ * Add an admin notice.
+ *
+ * Uses a transient to store the error messages.
  *
  * @param string $error Error message.
  */
@@ -212,7 +213,7 @@ function set_validation_errors( $error ) {
 }
 
 /**
- * Display validation errors.
+ * Display the error messages stored in a transient in an admin notice.
  */
 function admin_notices() {
 	if ( 'redirects' !== get_current_screen()->id ) {

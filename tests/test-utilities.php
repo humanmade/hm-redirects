@@ -1,6 +1,8 @@
 <?php
 /**
  * Test for the Utility functions.
+ *
+ * @package hm-redirects
  */
 
 namespace HM\Redirects\Tests;
@@ -8,6 +10,11 @@ namespace HM\Redirects\Tests;
 use HM\Redirects\Utilities;
 use WP_UnitTestCase;
 
+/**
+ * Class Utilities_Test
+ *
+ * @package HM\Redirects\Tests
+ */
 class Utilities_Test extends WP_UnitTestCase {
 
 	/**
@@ -39,7 +46,7 @@ class Utilities_Test extends WP_UnitTestCase {
 
 	/**
 	 * Provides valid test URLS.
-  *
+	 *
 	 * @return array
 	 */
 	public function provider_redirect_uri_valid() {

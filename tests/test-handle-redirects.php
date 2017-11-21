@@ -1,6 +1,8 @@
 <?php
 /**
  * Test for the Utility functions.
+ *
+ * @package hm-redirects
  */
 
 namespace HM\Redirects\Tests;
@@ -9,6 +11,11 @@ use HM\Redirects\Handle_Redirects;
 use HM\Redirects\Post_Type as Redirects_Post_Type;
 use WP_UnitTestCase;
 
+/**
+ * Class Handle_Redirects_Test
+ *
+ * @package HM\Redirects\Tests
+ */
 class Handle_Redirects_Test extends WP_UnitTestCase {
 
 	/**
@@ -61,11 +68,11 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 	 * Tests get_redirect_post.
 	 */
 	public function test_get_redirect_post_valid_urls() {
-		$p = $this->factory->post->create( array(
+		$p = $this->factory->post->create( [
 			'post_title' => 'Test Post',
 			'post_name'  => md5( '/test/this/path' ),
-			'post_type'  => Redirects_Post_Type\SLUG
-		) );
+			'post_type'  => Redirects_Post_Type\SLUG,
+		] );
 		$this->assertInstanceOf( 'WP_Post', Handle_Redirects\get_redirect_post( '/test/this/path' ) );
 
 		wp_delete_post( $p );
@@ -103,7 +110,7 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $original_url Original URL.
 	 * @param string $expected_result Expected result.
-	 * @param int $status_code HTTP status code.
+	 * @param int    $status_code HTTP status code.
 	 */
 	public function test_get_redirect_status_code( $original_url, $expected_result, $status_code ) {
 		// make sure we catch error when argument is missing.
@@ -117,7 +124,7 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 				'post_name'             => md5( $original_url ),
 				'post_type'             => Redirects_Post_Type\SLUG,
 				'post_excerpt'          => $expected_result,
-				'post_content_filtered' => $status_code
+				'post_content_filtered' => $status_code,
 			]
 		);
 

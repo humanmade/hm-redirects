@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/includes/post-type.php';
 HM\Redirects\Post_Type\setup();
 
-require_once __DIR__ . '/includes/admin-ui.php';
+require_once __DIR__ . '/includes/admin.php';
 HM\Redirects\Admin_UI\setup();
 
 require_once __DIR__ . '/includes/handle-redirects.php';

@@ -10,7 +10,7 @@ namespace HM\Redirects\Post_Type;
 /**
  * Redirects post type slug.
  */
-const SLUG = 'hm-redirects';
+const SLUG = 'hm_redirect';
 
 /**
  * Setup hooks.

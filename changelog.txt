@@ -1,0 +1,4 @@
+== Changelog ==
+
+= 0.1 =
+* Initial release. Handles redirects path and query argument redirects on the same domain.

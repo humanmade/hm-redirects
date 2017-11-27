@@ -34,11 +34,11 @@ function get_url_hash( $url ) {
 function normalise_url( $url ) {
 	// Sanitise the URL first rather than trying to normalise a non-URL.
 	if ( empty( esc_url_raw( $url ) ) ) {
-		return new WP_Error( 'invalid-redirect-url', 'The URL does not validate' );
+		return new WP_Error( 'invalid-redirect-url', esc_html__( 'The URL does not validate', 'hm-redirects' ) );
 	}
 
 	if ( false === filter_var( prefix_path( $url ), FILTER_VALIDATE_URL ) ) {
-		return new WP_Error( 'invalid-redirect-url', 'The URL does not validate' );
+		return new WP_Error( 'invalid-redirect-url', esc_html__( 'The URL does not validate', 'hm-redirects' ) );
 	}
 
 	// Break up the URL into it's constituent parts.
@@ -46,12 +46,12 @@ function normalise_url( $url ) {
 
 	// Avoid playing with unexpected data.
 	if ( ! is_array( $components ) ) {
-		return new WP_Error( 'url-parse-failed', 'The URL could not be parsed' );
+		return new WP_Error( 'url-parse-failed', esc_html__( 'The URL could not be parsed', 'hm-redirects' ) );
 	}
 
 	// We should have at least a path or query.
 	if ( ! isset( $components['path'] ) && ! isset( $components['query'] ) ) {
-		return new WP_Error( 'url-parse-failed', 'The URL contains neither a path nor query string' );
+		return new WP_Error( 'url-parse-failed', esc_html__( 'The URL contains neither a path nor query string', 'hm-redirects' ) );
 	}
 
 	// Make sure $components['query'] is set, to avoid errors.

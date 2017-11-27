@@ -26,7 +26,7 @@ function setup() {
 function add_meta_box() {
 	\add_meta_box(
 		'hm-redirects-meta',
-		'Redirect Settings',
+		esc_html__( 'Redirect Settings', 'hm-redirects' ),
 		__NAMESPACE__ . '\\output_meta_box',
 		Redirects_Post_Type\SLUG,
 		'normal',

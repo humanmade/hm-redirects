@@ -8,6 +8,7 @@
  * Version: 0.1
  * Author: Human Made Limited
  * Author URI: https://humanmade.com/
+ * Text Domain: hm-redirects
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

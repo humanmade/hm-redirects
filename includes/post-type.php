@@ -24,17 +24,17 @@ function setup() {
  */
 function register_post_type() {
 	$labels = [
-		'name'               => 'Redirects',
-		'singular_name'      => 'Redirect',
-		'add_new'            => 'Add New',
-		'add_new_item'       => 'Add New Redirect',
-		'edit_item'          => 'Edit Redirect',
-		'new_item'           => 'New Redirect',
-		'view_item'          => 'View Redirect',
-		'search_items'       => 'Search Redirects',
-		'not_found'          => 'No redirects found',
-		'not_found_in_trash' => 'No redirects found in trash',
-		'all_items'          => 'All Redirects',
+		'name'               => esc_html__( 'Redirects', 'hm-redirects' ),
+		'singular_name'      => esc_html__( 'Redirect', 'hm-redirects' ),
+		'add_new'            => esc_html__( 'Add New', 'hm-redirects' ),
+		'add_new_item'       => esc_html__( 'Add New Redirect', 'hm-redirects' ),
+		'edit_item'          => esc_html__( 'Edit Redirect', 'hm-redirects' ),
+		'new_item'           => esc_html__( 'New Redirect', 'hm-redirects' ),
+		'view_item'          => esc_html__( 'View Redirect', 'hm-redirects' ),
+		'search_items'       => esc_html__( 'Search Redirects', 'hm-redirects' ),
+		'not_found'          => esc_html__( 'No redirects found', 'hm-redirects' ),
+		'not_found_in_trash' => esc_html__( 'No redirects found in trash', 'hm-redirects' ),
+		'all_items'          => esc_html__( 'All Redirects', 'hm-redirects' ),
 	];
 
 	\register_post_type(

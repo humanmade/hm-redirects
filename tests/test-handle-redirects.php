@@ -39,7 +39,7 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 	 */
 	public function provider_normalised_url_invalid() {
 		return [
-			[ 'http://thesun.dev' ], // No path.
+			[ 'http://example.com' ], // No path.
 			[ 'http://url%20invalid%20charcaters' ], // Invalid character.
 			[ '/invalidcharacters¡™£¢∞§¶•ªº%5B%5D/here' ], // Invalid character.
 		];

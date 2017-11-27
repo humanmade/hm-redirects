@@ -1,12 +1,10 @@
 # HM Redirects
 
+Allows to redirect one path to another path on the same domain.
+
 ## Architecture
 Redirects are stored as a custom post type and use the following fields:
 
-- post_name for the md5 hash of the "from" path or URL.
-- we use this column, since it's indexed and queries are super fast.
-- we also use an md5 just to simplify the storage.
-- post_title to store the non-md5 version of the "from" path.
-- one of either:
-- post_parent if we're redirect to a post; or
-- post_excerpt if we're redirecting to an alternate URL.
+- `post_name` to store the md5 hash of the _From_ path. This column is used because it is indexed, and allows fast queries. `md5` is used to simplify the storage.
+- `post_title` to store the _From_ path.
+- `post_excerpt`to store the the _To_ path.

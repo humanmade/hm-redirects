@@ -17,8 +17,8 @@ use WP_Post;
 function setup() {
 	add_action( 'add_meta_boxes', __NAMESPACE__ . '\\add_meta_box' );
 	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
+	add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_plugin_textdomain' );
 }
-
 
 /**
  * Add the metabox for the redirects.
@@ -109,4 +109,11 @@ function handle_redirect_saving( $post_id ) {
 	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
 
 	return (int) $return === (int) $post_id;
+}
+
+/**
+ * Load the plugin translations.
+ */
+function load_plugin_textdomain() {
+	\load_plugin_textdomain( 'hm-redirects', false, basename( dirname( dirname( __FILE__ ) ) ) . '/languages/' );
 }

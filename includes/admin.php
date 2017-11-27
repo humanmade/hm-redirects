@@ -53,24 +53,24 @@ function output_meta_box( WP_Post $post ) {
 	$status_code = ! empty( $post->post_content_filtered ) ? $post->post_content_filtered : 302;
 	?>
 	<p>
-		<label for="hm_redirects_from_url">From URL</label><br>
+		<label for="hm_redirects_from_url"><?php esc_html_e( 'From URL', 'hm-redirects' ); ?></label><br>
 		<input type="text" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $post->post_title ); ?>" class="regular-text code"/>
 	</p>
-	<p class="description">This path should be relative to the root of the site.</p>
+	<p class="description"><?php esc_html_e( 'This path should be relative to the root of the site.', 'hm-redirects' ); ?></p>
 
 	<p>
-		<label for="hm_redirects_to_url">To URL</label><br>
+		<label for="hm_redirects_to_url"><?php esc_html_e( 'To URL', 'hm-redirects' ); ?></label><br>
 		<input type="text" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $post->post_excerpt ); ?>" class="regular-text code"/>
 	</p>
 
 	<p>
-		<label for="hm_redirects_status_code">HTTP Status Code:</label>
+		<label for="hm_redirects_status_code"><?php esc_html_e( 'HTTP Status Code:', 'hm-redirects' ); ?></label>
 		<select name="hm_redirects_status_code" id="hm_redirects_status_code">
 			<?php foreach ( $valid_status_codes as $code ) : ?>
 				<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $status_code_labels[ $code ] ); ?></option>
 			<?php endforeach; ?>
 		</select>
-		<em>If you don't know what this is, leave it as is.</em>
+		<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'hm-redirects' ); ?></em>
 	</p>
 	<?php
 	wp_nonce_field( 'hm_redirects', 'hm_redirects_nonce' );

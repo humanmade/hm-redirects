@@ -25,3 +25,8 @@ require_once __DIR__ . '/includes/handle-redirects.php';
 HM\Redirects\Handle_Redirects\setup();
 
 require_once __DIR__ . '/includes/utilities.php';
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once( __DIR__ . '/includes/cli.php' );
+	WP_CLI::add_command( 'hm-redirects', 'HM\\Redirects\\CLI\\Commands' );
+}

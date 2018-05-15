@@ -1,0 +1,15 @@
+{
+    "name" : "humanmade/hm-redirects",
+    "description": "Simple plugin for handling WordPress redirects in a scalable manner.",
+    "type": "wordpress-plugin",
+    "homepage" : "https://github.com/humanmade/hm-redirects",
+    "license" : "GPL-2.0+",
+    "keywords": [
+        "WordPress",
+        "redirects"
+    ],
+    "require": {
+        "php": ">=5.4",
+        "composer/installers": "~1.0"
+    }
+}

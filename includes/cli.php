@@ -174,15 +174,19 @@ class Commands extends WP_CLI_Command {
 			$row++;
 			$redirect_from = $data[ 0 ];
 			$redirect_to   = $data[ 1 ];
-			$skip_redirect = false;
 
 			// Convert "redirect to" post IDs to permalinks.
 			if ( ctype_digit( $redirect_to ) ) {
 				$redirect_to = get_permalink( (int) $redirect_to );
 
 				if ( ! $redirect_to ) {
-					$redirect_to   = $data[ 1 ];
-					$skip_redirect = true;
+					$notices[] = array(
+						'redirect_from' => $redirect_from,
+						'redirect_to'   => $data[ 1 ],
+						'message'       => 'Skipped - could not find redirect_to post',
+					);
+
+					continue;
 				}
 			}
 
@@ -193,16 +197,14 @@ class Commands extends WP_CLI_Command {
 				WP_CLI::line( "Processing row $row" );
 			}
 
-			if ( ! $skip_redirect ) {
-				$inserted = Utilities\insert_redirect( [
-					'from'        => $redirect_from,
-					'to'          => $redirect_to,
-					'status_code' => 301,
-				] );
-			}
+			$inserted = Utilities\insert_redirect( [
+				'from'        => $redirect_from,
+				'to'          => $redirect_to,
+				'status_code' => 301,
+			] );
 
 			// Record any error notices.
-			if ( $skip_redirect || ! $inserted ) {
+			if ( ! $inserted ) {
 				$notices[] = array(
 					'redirect_from' => $redirect_from,
 					'redirect_to'   => $redirect_to,

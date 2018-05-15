@@ -45,6 +45,12 @@ function maybe_do_redirect() {
 
 	$redirect_uri = get_redirect_uri( $request_path );
 
+	// We matched a redirect. Whitelist its domain for wp_safe_redirect().
+	add_filter( 'allowed_redirect_hosts', function( $hosts ) use ( $redirect_uri ) {
+		$hosts[] = wp_parse_url( $redirect_uri, PHP_URL_HOST );
+		return $hosts;
+	} );
+
 	if ( ! wp_validate_redirect( $redirect_uri ) ) {
 		return false;
 	}

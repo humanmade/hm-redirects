@@ -4,7 +4,7 @@
  *
  * @package hm-redirects
  *
- * Description: Simple plugin for handling redirects in a scalable manner.
+ * Description: Handles redirects in a scalable manner.
  * Version: 0.1
  * Author: Human Made Limited
  * Author URI: https://humanmade.com/

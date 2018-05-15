@@ -7,7 +7,7 @@
 
 namespace HM\Redirects\Utilities;
 
-use HM\Redirects\Post_Type as Redirects_Post_Type;
+use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 use WP_Error;
 use WP_Query;
 
@@ -85,3 +85,34 @@ function prefix_path( $url ) {
 
 	return $url;
 }
+
+/**
+ * Add a redirect.
+ *
+ * @param array $redirect Arguments for the redirect.
+ *
+ * @return int The ID of the Post if redirect successfully added. Otherwise returns 0.
+ */
+function insert_redirect( $redirect ) {
+	// Stop loops.
+	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
+
+	if ( ! isset( $redirect['post_id'] ) ) {
+		$redirect['post_id'] = 0;
+	}
+
+	$post_id = wp_insert_post( [
+		'ID'                    => $redirect['post_id'],
+		'post_content_filtered' => strtolower( $redirect['status_code'] ),
+		'post_excerpt'          => strtolower( $redirect['to'] ),
+		'post_name'             => get_url_hash( $redirect['from'] ),
+		'post_status'           => 'publish',
+		'post_title'            => strtolower( $redirect['from'] ),
+		'post_type'             => REDIRECTS_POST_TYPE,
+	] );
+
+	add_action( 'save_post', 'HM\\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
+
+	return $post_id;
+}
+

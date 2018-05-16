@@ -9,5 +9,9 @@ Redirects are stored as a custom post type and use the following fields:
 - `post_title` to store the _From_ path.
 - `post_excerpt`to store the the _To_ path.
 
+## Tips
+This plugin uses `wp_safe_redirect()` to redirect. You will have to whitelist your redirect target domains using WordPress' `allowed_redirect_hosts` filter, otherwise the redirect will not work.
+One way to get a list of redirect target domains is to run the WP-CLI command: `wp hm-redirects find-domains`. Another is to add them dynamically just-in-time using the filter `hm_redirects_matched_redirect`.
+
 ## Attributions
 Props for the data storage approach to VIP's [WPCOM Legacy Redirector](https://github.com/Automattic/WPCOM-Legacy-Redirector).

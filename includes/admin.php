@@ -98,7 +98,7 @@ function handle_redirect_saving( $post_id ) {
 
 	$redirect_id = Utilities\insert_redirect( compact( 'post_id', 'from', 'to', 'status_code' ) );
 
-	return (int) $redirect_id === (int) $post_id;
+	return $redirect_id === $post_id;
 }
 
 /**

@@ -112,10 +112,15 @@ class Commands extends WP_CLI_Command {
 			$to = esc_url_raw( $args[1] );
 		}
 
-		$inserted = Utilities\insert_redirect( compact( 'from', 'to', 'status_code' ) );
+		$redirect = Utilities\insert_redirect( compact( 'from', 'to', 'status_code' ) );
 
-		if ( ! $inserted ) {
-			WP_CLI::error( sprintf( "Couldn't insert %s -> %s", $from, $to ) );
+		if ( is_wp_error( $redirect ) ) {
+			WP_CLI::error( sprintf(
+				"Couldn't insert %s -> %s: %s",
+				$from,
+				$to,
+				implode( PHP_EOL, $redirect->get_error_messages() )
+			) );
 		}
 
 		WP_CLI::success( sprintf( "Inserted %s -> %s", $from, $to ) );
@@ -197,18 +202,21 @@ class Commands extends WP_CLI_Command {
 				WP_CLI::line( "Processing row $row" );
 			}
 
-			$inserted = Utilities\insert_redirect( [
+			$redirect = Utilities\insert_redirect( [
 				'from'        => $redirect_from,
 				'to'          => $redirect_to,
 				'status_code' => 301,
 			] );
 
 			// Record any error notices.
-			if ( ! $inserted ) {
+			if ( is_wp_error( $redirect ) ) {
 				$notices[] = array(
 					'redirect_from' => $redirect_from,
 					'redirect_to'   => $redirect_to,
-					'message'       => 'Could not insert redirect',
+					'message'       => sprintf(
+						'Could not insert redirect: %s',
+						implode( PHP_EOL, $redirect->get_error_messages() )
+					),
 				);
 
 			// Record success notices.
@@ -362,18 +370,21 @@ class Commands extends WP_CLI_Command {
 
 				// Add redirects.
 				if ( $dry_run === false ) {
-					$inserted = Utilities\insert_redirect( [
+					$redirect = Utilities\insert_redirect( [
 						'from'        => $redirect_from,
 						'to'          => $redirect_to,
 						'status_code' => 301,
 					] );
 
 					// Record any error notices.
-					if ( ! $inserted ) {
+					if ( ! $redirect ) {
 						$notices[] = array(
 							'redirect_from' => $redirect_from,
 							'redirect_to'   => $redirect_to,
-							'message'       => 'Could not insert redirect',
+							'message'       => sprintf(
+								'Could not insert redirect: %s',
+								implode( PHP_EOL, $redirect->get_error_messages() )
+							),
 						);
 
 					// Record success notices.

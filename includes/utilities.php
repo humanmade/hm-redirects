@@ -91,7 +91,7 @@ function prefix_path( $url ) {
  *
  * @param array $redirect Arguments for the redirect.
  *
- * @return int The ID of the Post if redirect successfully added. Otherwise returns 0.
+ * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
 function insert_redirect( $redirect ) {
 	// Stop loops.
@@ -101,19 +101,22 @@ function insert_redirect( $redirect ) {
 		$redirect['post_id'] = 0;
 	}
 
-	$post_id = wp_insert_post( [
-		'ID'                    => $redirect['post_id'],
-		'post_content_filtered' => strtolower( $redirect['status_code'] ),
-		'post_excerpt'          => strtolower( $redirect['to'] ),
-		'post_name'             => get_url_hash( $redirect['from'] ),
-		'post_status'           => 'publish',
-		'post_title'            => strtolower( $redirect['from'] ),
-		'post_type'             => REDIRECTS_POST_TYPE,
-	] );
+	$result = wp_insert_post(
+		[
+			'ID'                    => $redirect['post_id'],
+			'post_content_filtered' => strtolower( $redirect['status_code'] ),
+			'post_excerpt'          => strtolower( $redirect['to'] ),
+			'post_name'             => get_url_hash( $redirect['from'] ),
+			'post_status'           => 'publish',
+			'post_title'            => strtolower( $redirect['from'] ),
+			'post_type'             => REDIRECTS_POST_TYPE,
+		],
+		true
+	);
 
 	add_action( 'save_post', 'HM\\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
 
-	return $post_id;
+	return $result;
 }
 
 /**

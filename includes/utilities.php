@@ -118,10 +118,8 @@ function insert_redirect( $redirect ) {
 
 /**
  * Clear all caches for memory management.
- *
- * From Automattic, name kept with love.
  */
-function stop_the_insanity() {
+function clear_object_cache() {
 	global $wpdb, $wp_object_cache;
 
 	$wpdb->queries = array();

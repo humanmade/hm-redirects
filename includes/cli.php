@@ -221,7 +221,7 @@ class Commands extends WP_CLI_Command {
 			}
 
 			if ( 0 === $row % 100 ) {
-				Utilities\stop_the_insanity();
+				Utilities\clear_object_cache();
 
 				// Throttle writes.
 				sleep( 1 );
@@ -387,7 +387,7 @@ class Commands extends WP_CLI_Command {
 				}
 
 				if ( 0 === $row % 100 ) {
-					Utilities\stop_the_insanity();
+					Utilities\clear_object_cache();
 
 					// Throttle writes.
 					sleep( 1 );

@@ -376,7 +376,7 @@ class Commands extends WP_CLI_Command {
 					);
 
 					// Record any error notices.
-					if ( ! $redirect ) {
+					if ( is_wp_error( $redirect ) ) {
 						$notices[] = array(
 							'redirect_from' => $redirect_from,
 							'redirect_to'   => $redirect_to,

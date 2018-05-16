@@ -96,7 +96,7 @@ function handle_redirect_saving( $post_id ) {
 	$to          = isset( $_POST['hm_redirects_to_url'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_to_url'] ) ) : '';
 	$status_code = isset( $_POST['hm_redirects_status_code'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_status_code'] ) ) : 302;
 
-	$redirect_id = Utilities\insert_redirect( compact( 'post_id', 'from', 'to', 'status_code' ) );
+	$redirect_id = Utilities\insert_redirect( $from, $to, $status_code, $post_id );
 
 	return $redirect_id === $post_id;
 }

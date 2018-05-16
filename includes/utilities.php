@@ -89,22 +89,21 @@ function prefix_path( $url ) {
 /**
  * Add a redirect.
  *
- * @param array $redirect Arguments for the redirect.
+ * @param string $redirect $from Leading-slashed relative URL to redirect away from.
+ * @param string $to Absolute URL to redirect to.
+ * @param int $status_code HTTP status code for the redirect.
+ * @param int $post_id Optional. If set, update that existing redirect.
  *
  * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
-function insert_redirect( $redirect ) {
+function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	// Stop loops.
 	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
-
-	if ( ! isset( $redirect['post_id'] ) ) {
-		$redirect['post_id'] = 0;
-	}
 
 	$result = wp_insert_post(
 		[
 			'ID'                    => $redirect['post_id'],
-			'post_content_filtered' => strtolower( $redirect['status_code'] ),
+			'post_content_filtered' => $redirect['status_code'],
 			'post_excerpt'          => strtolower( $redirect['to'] ),
 			'post_name'             => get_url_hash( $redirect['from'] ),
 			'post_status'           => 'publish',

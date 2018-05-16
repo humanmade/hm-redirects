@@ -99,8 +99,7 @@ class Commands extends WP_CLI_Command {
 	 * @param string[] $assoc_args Not used.
 	 */
 	public function insert_redirect( $args, $assoc_args ) {
-		$from        = $args[0];
-		$status_code = 301;
+		$from = $args[0];
 
 		if ( ctype_digit( $args[1] ) ) {
 			$to = get_permalink( (int) $args[1] );
@@ -112,7 +111,7 @@ class Commands extends WP_CLI_Command {
 			$to = esc_url_raw( $args[1] );
 		}
 
-		$redirect = Utilities\insert_redirect( compact( 'from', 'to', 'status_code' ) );
+		$redirect = Utilities\insert_redirect( $from, $to, 301 ) );
 
 		if ( is_wp_error( $redirect ) ) {
 			WP_CLI::error( sprintf(
@@ -202,11 +201,11 @@ class Commands extends WP_CLI_Command {
 				WP_CLI::line( "Processing row $row" );
 			}
 
-			$redirect = Utilities\insert_redirect( [
-				'from'        => $redirect_from,
-				'to'          => $redirect_to,
-				'status_code' => 301,
-			] );
+			$redirect = Utilities\insert_redirect(
+				$redirect_from,
+				esc_url_raw( $redirect_to ),
+				301
+			);
 
 			// Record any error notices.
 			if ( is_wp_error( $redirect ) ) {
@@ -370,11 +369,11 @@ class Commands extends WP_CLI_Command {
 
 				// Add redirects.
 				if ( $dry_run === false ) {
-					$redirect = Utilities\insert_redirect( [
-						'from'        => $redirect_from,
-						'to'          => $redirect_to,
-						'status_code' => 301,
-					] );
+					$redirect = Utilities\insert_redirect(
+						$redirect_from,
+						$redirect_to,
+						301
+					);
 
 					// Record any error notices.
 					if ( ! $redirect ) {

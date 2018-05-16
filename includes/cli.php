@@ -5,8 +5,9 @@
  * Originally taken from Automattic's WPCOM-Legacy-Redirector plugin. ❤️
  * https://github.com/Automattic/WPCOM-Legacy-Redirector
  *
- * For familarity reasons, these commands work identically.
- * `import-from-meta` is not yet supported.
+ * For familiarity reasons, these commands work the same as those in that plugin.
+ * However our "redirect from" URLs need to be relative to the root of the site,
+ * and have a leading slash.
  *
  * @package hm-redirects
  */
@@ -14,8 +15,7 @@
 namespace HM\Redirects\CLI;
 
 use WP_CLI, WP_CLI_Command;
-use WP_CLI\Utils;
-use HM\Redirects\Utilities;
+use HM\Redirects\{Utilities, Handle_Redirects};
 use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 
 /**
@@ -193,7 +193,7 @@ class Commands extends WP_CLI_Command {
 			if ( $verbose ) {
 				WP_CLI::line( "Adding (CSV) redirect for {$redirect_from} to {$redirect_to}" );
 				WP_CLI::line( "-- at $row" );
-			} elseif ( 0 == $row % 100 ) {
+			} elseif ( 0 === $row % 100 ) {
 				WP_CLI::line( "Processing row $row" );
 			}
 
@@ -220,7 +220,7 @@ class Commands extends WP_CLI_Command {
 				);
 			}
 
-			if ( 0 == $row % 100 ) {
+			if ( 0 === $row % 100 ) {
 				Utilities\stop_the_insanity();
 
 				// Throttle writes.
@@ -229,6 +229,175 @@ class Commands extends WP_CLI_Command {
 		}
 
 		fclose( $handle );
+
+		if ( count( $notices ) > 0 ) {
+			WP_CLI\Utils\format_items( $format, $notices, array( 'redirect_from', 'redirect_to', 'message' ) );
+		} else {
+			echo WP_CLI::colorize( "%GAll of your redirects have been imported. Nice work!%n " );
+		}
+	}
+
+	/**
+	 * Bulk import redirects from URLs stored as meta values for posts.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--start=<start-offset>]
+	 *
+	 * [--end=<end-offset>]
+	 *
+	 * [--skip_dupes=<skip-dupes>]
+	 *
+	 * [--format=<format>]
+	 * : Render output in a particular format.
+	 * ---
+	 * default: csv
+	 * options:
+	 *   - table
+	 *   - json
+	 *   - yaml
+	 *   - csv
+	 * ---
+	 *
+	 * [--dry_run]
+	 *
+	 * [--verbose]
+	 * : Display notices for sucessful imports and duplicates (if skip_dupes is used)
+	 *
+	 * @subcommand import-from-meta
+	 * @synopsis --meta_key=<name-of-meta-key> [--start=<start-offset>] [--end=<end-offset>] [--skip_dupes=<skip-dupes>] [--format=<format>] [--dry_run] [--verbose]
+	 *
+	 * @param string[] $args Positional arguments.
+	 * @param string[] $assoc_args Associative arguments.
+	 */
+	function import_from_meta( $args, $assoc_args ) {
+		global $wpdb;
+
+		define( 'WP_IMPORTING', true );
+
+		$meta_key   = isset( $assoc_args['meta_key'] ) ? sanitize_key( $assoc_args['meta_key'] ) : 'change-me';
+		$offset     = isset( $assoc_args['start'] ) ? intval( $assoc_args['start'] ) : 0;
+		$end_offset = isset( $assoc_args['end'] ) ? intval( $assoc_args['end'] ) : 99999999;;
+
+		$skip_dupes = isset( $assoc_args['skip_dupes'] ) ? (bool) intval( $assoc_args['skip_dupes'] ) : false;
+		$dry_run    = isset( $assoc_args['dry_run'] );
+		$format     = WP_CLI\Utils\get_flag_value( $assoc_args, 'format' );
+		$verbose    = isset( $assoc_args['verbose'] );
+
+		if ( $dry_run ) {
+			WP_CLI::line( '---Dry Run---' );
+		} else {
+			WP_CLI::line( '---Live Run--' );
+		}
+
+		// Check we have any work to do.
+		$total_redirects = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT( post_id ) FROM $wpdb->postmeta WHERE meta_key = %s",
+				$meta_key
+			)
+		);
+
+		if ( $total_redirects === 0 ) {
+			WP_CLI::error( sprintf( 'No redirects found for meta_key: %s', $meta_key ) );
+		}
+
+		$progress_bar = WP_CLI\Utils\make_progress_bar( sprintf( 'Importing %s redirects', number_format( $total_redirects ) ), $total_redirects );
+		$notices      = array();
+
+		// Start the import; loop through batches of posts.
+		do {
+			$redirects = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT post_id as redirect_to_post_id, meta_value as abs_redirect_from FROM $wpdb->postmeta WHERE meta_key = %s ORDER BY post_id ASC LIMIT %d, 1000",
+					$meta_key,
+					$offset
+				)
+			);
+
+			$total = count( $redirects );
+			$row   = 0;
+
+			foreach ( $redirects as $redirect ) {
+				$row++;
+				$progress_bar->tick();
+
+				// "Redirect from" parameter must be relative to the root of the site.
+				$redirect_from = wp_parse_url( $redirect->abs_redirect_from, PHP_URL_PATH );
+				$query_args    = wp_parse_url( $redirect->abs_redirect_from, PHP_URL_QUERY );
+
+				if ( $query_args !== null ) {
+					$redirect_from = "?{$query_args}";
+				}
+
+				// The "redirect to" value is a post ID. Grab the appropriate URL.
+				$redirect_to = get_permalink( (int) $redirect->redirect_to_post_id );
+				if ( ! $redirect_to ) {
+					$notices[] = array(
+						'redirect_from' => $redirect_from,
+						'redirect_to'   => $redirect->redirect_to_post_id,
+						'message'       => 'Skipped - could not find redirect_to post',
+					);
+
+					continue;
+				}
+
+
+				if ( $skip_dupes ) {
+					$has_existing_redirect = Handle_Redirects\get_redirect_post( $redirect_from );
+					$has_existing_redirect = ( $has_existing_redirect === null ) ? false : true;
+
+					if ( $has_existing_redirect ) {
+						if ( $verbose ) {
+							$notices[] = array(
+								'redirect_from' => $redirect_from,
+								'redirect_to'   => $redirect_to,
+								'message'       => sprintf( 'Skipped - "redirect from" URL already exists (%s)', $redirect_from ),
+							);
+						}
+
+						continue;
+					}
+				}
+
+				// Add redirects.
+				if ( $dry_run === false ) {
+					$inserted = Utilities\insert_redirect( [
+						'from'        => $redirect_from,
+						'to'          => $redirect_to,
+						'status_code' => 301,
+					] );
+
+					// Record any error notices.
+					if ( ! $inserted ) {
+						$notices[] = array(
+							'redirect_from' => $redirect_from,
+							'redirect_to'   => $redirect_to,
+							'message'       => 'Could not insert redirect',
+						);
+
+					// Record success notices.
+					} elseif ( $verbose ) {
+						$notices[] = array(
+							'redirect_from' => $redirect_from,
+							'redirect_to'   => $redirect_to,
+							'message'       => 'Successfully imported',
+						);
+					}
+				}
+
+				if ( 0 === $row % 100 ) {
+					Utilities\stop_the_insanity();
+
+					// Throttle writes.
+					sleep( 1 );
+				}
+			}
+
+			$offset += 1000;
+		} while( $total >= 1000 && $offset < $end_offset );
+
+		$progress_bar->finish();
 
 		if ( count( $notices ) > 0 ) {
 			WP_CLI\Utils\format_items( $format, $notices, array( 'redirect_from', 'redirect_to', 'message' ) );

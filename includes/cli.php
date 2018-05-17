@@ -154,8 +154,8 @@ class Commands extends WP_CLI_Command {
 	public function import_from_csv( $args, $assoc_args ) {
 		define( 'WP_IMPORTING', true );
 
-		$csv     = trim( Utils\get_flag_value( $assoc_args, 'csv' ) );
-		$format  = Utils\get_flag_value( $assoc_args, 'format' );
+		$csv     = trim( WP_CLI\Utils\get_flag_value( $assoc_args, 'csv' ) );
+		$format  = WP_CLI\Utils\get_flag_value( $assoc_args, 'format' );
 		$verbose = isset( $assoc_args['verbose'] );
 
 		if ( ! $csv || ! file_exists( $csv ) ) {

@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 0.3 =
+* Add WP-CLI commands.
+
 = 0.2 =
 * Internationalisation improvements.
 

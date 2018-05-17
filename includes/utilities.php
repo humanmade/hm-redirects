@@ -102,12 +102,12 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 
 	$result = wp_insert_post(
 		[
-			'ID'                    => $redirect['post_id'],
-			'post_content_filtered' => $redirect['status_code'],
-			'post_excerpt'          => strtolower( $redirect['to'] ),
-			'post_name'             => get_url_hash( $redirect['from'] ),
+			'ID'                    => $post_id,
+			'post_content_filtered' => $status_code,
+			'post_excerpt'          => strtolower( $to ),
+			'post_name'             => get_url_hash( $from ),
 			'post_status'           => 'publish',
-			'post_title'            => strtolower( $redirect['from'] ),
+			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
 		],
 		true

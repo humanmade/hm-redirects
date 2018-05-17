@@ -111,7 +111,7 @@ class Commands extends WP_CLI_Command {
 			$to = esc_url_raw( $args[1] );
 		}
 
-		$redirect = Utilities\insert_redirect( $from, $to, 301 ) );
+		$redirect = Utilities\insert_redirect( $from, $to, 301 );
 
 		if ( is_wp_error( $redirect ) ) {
 			WP_CLI::error( sprintf(

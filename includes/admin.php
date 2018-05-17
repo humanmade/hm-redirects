@@ -93,22 +93,12 @@ function handle_redirect_saving( $post_id ) {
 	}
 
 	$from        = isset( $_POST['hm_redirects_from_url'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_from_url'] ) ) : '';
-	$to          = isset( $_POST['hm_redirects_to_url'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_to_url'] ) ) : '';
-	$status_code = isset( $_POST['hm_redirects_status_code'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_status_code'] ) ) : 302;
+	$to          = isset( $_POST['hm_redirects_to_url'] ) ? esc_url_raw( wp_unslash( $_POST['hm_redirects_to_url'] ) ) : '';
+	$status_code = isset( $_POST['hm_redirects_status_code'] ) ? (int) $_POST['hm_redirects_status_code'] : 302;
 
-	remove_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
+	$redirect_id = Utilities\insert_redirect( $from, $to, $status_code, $post_id );
 
-	$return = wp_update_post( [
-		'ID'                    => $post_id,
-		'post_name'             => Utilities\get_url_hash( $from ),
-		'post_title'            => strtolower( $from ),
-		'post_excerpt'          => strtolower( $to ),
-		'post_content_filtered' => strtolower( $status_code ),
-	] );
-
-	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
-
-	return (int) $return === (int) $post_id;
+	return $redirect_id === $post_id;
 }
 
 /**

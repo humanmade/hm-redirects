@@ -31,19 +31,35 @@ function maybe_do_redirect() {
 		return false;
 	}
 
-	$url = untrailingslashit( str_replace( wp_parse_url( home_url(), PHP_URL_PATH ), '', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
+	$path = untrailingslashit( str_replace( wp_parse_url( home_url(), PHP_URL_PATH ), '', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
 
 	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
-		$url .= '?' . sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) );
+		$path .= '?' . sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) );
 	}
 
-	$request_path = apply_filters( 'hm_redirects_request_path', $url );
-
-	if ( ! $url ) {
+	/**
+	 * Filter the request path before searching for a matching redirect.
+	 *
+	 * @param string $path
+	 */
+	$request_path = apply_filters( 'hm_redirects_request_path', $path );
+	if ( ! $request_path ) {
 		return false;
 	}
 
+	// Try to find a matching redirect.
 	$redirect_uri = get_redirect_uri( $request_path );
+	if ( ! $redirect_uri ) {
+		return false;
+	}
+
+	/**
+	 * Fires when the request path matches a redirect.
+	 *
+	 * @param string $redirect_uri Redirect-sanitised URL.
+	 * @param string $request_path The request path that matched the redirect.
+	 */
+	do_action( 'hm_redirects_matched_redirect', $redirect_uri, $request_path );
 
 	if ( ! wp_validate_redirect( $redirect_uri ) ) {
 		return false;
@@ -59,7 +75,7 @@ function maybe_do_redirect() {
  *
  * @param string $url The URL to redirect to.
  *
- * @return bool|false|string
+ * @return false|string Redirect-sanitised URL, or false if no valid redirect matched.
  */
 function get_redirect_uri( $url ) {
 	$url = Utilities\normalise_url( $url );
@@ -68,7 +84,6 @@ function get_redirect_uri( $url ) {
 	}
 
 	$redirect_post = get_redirect_post( $url );
-
 	if ( is_null( $redirect_post ) ) {
 		return false;
 	}

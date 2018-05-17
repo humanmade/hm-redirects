@@ -7,7 +7,7 @@
 
 namespace HM\Redirects\Utilities;
 
-use HM\Redirects\Post_Type as Redirects_Post_Type;
+use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 use WP_Error;
 use WP_Query;
 
@@ -84,4 +84,58 @@ function prefix_path( $url ) {
 	}
 
 	return $url;
+}
+
+/**
+ * Add a redirect.
+ *
+ * @param string $redirect $from Leading-slashed relative URL to redirect away from.
+ * @param string $to Absolute URL to redirect to.
+ * @param int $status_code HTTP status code for the redirect.
+ * @param int $post_id Optional. If set, update that existing redirect.
+ *
+ * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
+ */
+function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
+	// Stop loops.
+	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
+
+	$result = wp_insert_post(
+		[
+			'ID'                    => $post_id,
+			'post_content_filtered' => $status_code,
+			'post_excerpt'          => strtolower( $to ),
+			'post_name'             => get_url_hash( $from ),
+			'post_status'           => 'publish',
+			'post_title'            => strtolower( $from ),
+			'post_type'             => REDIRECTS_POST_TYPE,
+		],
+		true
+	);
+
+	add_action( 'save_post', 'HM\\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
+
+	return $result;
+}
+
+/**
+ * Clear all caches for memory management.
+ */
+function clear_object_cache() {
+	global $wpdb, $wp_object_cache;
+
+	$wpdb->queries = array();
+
+	if ( ! is_object( $wp_object_cache ) ) {
+		return;
+	}
+
+	$wp_object_cache->group_ops      = array();
+	$wp_object_cache->stats          = array();
+	$wp_object_cache->memcache_debug = array();
+	$wp_object_cache->cache          = array();
+
+	if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
+		$wp_object_cache->__remoteset(); // important
+	}
 }

@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 0.4 =
+* Remove usage of `filter_var()` to support domains with non-ASCII characters.
+
 = 0.3 =
 * Add WP-CLI commands.
 

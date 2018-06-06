@@ -37,10 +37,6 @@ function normalise_url( $url ) {
 		return new WP_Error( 'invalid-redirect-url', esc_html__( 'The URL does not validate', 'hm-redirects' ) );
 	}
 
-	if ( false === filter_var( prefix_path( $url ), FILTER_VALIDATE_URL ) ) {
-		return new WP_Error( 'invalid-redirect-url', esc_html__( 'The URL does not validate', 'hm-redirects' ) );
-	}
-
 	// Break up the URL into it's constituent parts.
 	$components = wp_parse_url( $url );
 

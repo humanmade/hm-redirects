@@ -40,7 +40,6 @@ class Utilities_Test extends WP_UnitTestCase {
 		return [
 			[ 'http://example.com' ], // No path.
 			[ 'http://url%20invalid%20charcaters' ], // Invalid character.
-			[ '/invalidcharacters¡™£¢∞§¶•ªº%5B%5D/here' ], // Invalid character.
 		];
 	}
 

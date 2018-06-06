@@ -93,9 +93,8 @@ function get_redirect_uri( $url ) {
 		return false;
 	}
 
-	if ( false === filter_var( $to_url, FILTER_VALIDATE_URL ) ) {
-		$to_url = home_url() . $redirect_post->post_excerpt;
-	}
+	// If the URL is only a path, prefix it with the `home_url()`.
+	$to_url = Utilities\prefix_path( $to_url );
 
 	return wp_sanitize_redirect( $to_url );
 }

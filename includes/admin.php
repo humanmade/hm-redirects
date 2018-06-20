@@ -54,13 +54,13 @@ function output_meta_box( WP_Post $post ) {
 	?>
 	<p>
 		<label for="hm_redirects_from_url"><?php esc_html_e( 'From URL', 'hm-redirects' ); ?></label><br>
-		<input type="text" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $post->post_title ); ?>" class="regular-text code"/>
+		<input type="text" class="widefat" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $post->post_title ); ?>" class="regular-text code"/>
 	</p>
 	<p class="description"><?php esc_html_e( 'This path should be relative to the root of the site.', 'hm-redirects' ); ?></p>
 
 	<p>
 		<label for="hm_redirects_to_url"><?php esc_html_e( 'To URL', 'hm-redirects' ); ?></label><br>
-		<input type="text" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $post->post_excerpt ); ?>" class="regular-text code"/>
+		<input type="text" class="widefat" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $post->post_excerpt ); ?>" class="regular-text code"/>
 	</p>
 
 	<p>

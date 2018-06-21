@@ -26,5 +26,7 @@
     <rule ref="WordPress-VIP">
         <!-- Don't enforce Yoda conditions. -->
         <exclude name="WordPress.PHP.YodaConditions" />
+        <!-- Don't warn about usages of super globals -->
+        <exclude name="WordPress.VIP.SuperGlobalInputUsage" />
     </rule>
 </ruleset>

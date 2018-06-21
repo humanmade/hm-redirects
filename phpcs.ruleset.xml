@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset>
+    <!-- Use HM Coding Standards -->
+    <rule ref="vendor/humanmade/coding-standards">
+        <!-- Don't restrict namespaced functions to `namespace.php` -->
+        <exclude name="HM.Files.FunctionFileName" />
+
+        <!-- Don't restrict namespace to `inc/` directory -->
+        <exclude name="HM.Files.NamespaceDirectoryName" />
+    </rule>
+
+    <!-- Selectively apply the HM namespaces sniff -->
+    <rule ref="HM.Functions.NamespacedFunctions">
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <!-- Selectively apply the PSR-1 side effects sniff -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <!-- Add PHPDoc rules -->
+    <rule ref="WordPress-Docs" />
+
+    <!-- Add VIP-specific rules -->
+    <rule ref="WordPress-VIP">
+        <!-- Don't enforce Yoda conditions. -->
+        <exclude name="WordPress.PHP.YodaConditions" />
+    </rule>
+</ruleset>

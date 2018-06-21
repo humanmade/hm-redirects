@@ -135,3 +135,18 @@ function clear_object_cache() {
 		$wp_object_cache->__remoteset(); // important
 	}
 }
+
+/**
+ * Add a leading slash to a string.
+ *
+ * This function ensures that only a single leading slash will be present.
+ *
+ * @param $string String to add leading slash to.
+ *
+ * @return string String with a single leading slash.
+ */
+function add_leading_slash( $string ) {
+	$string = ltrim( $string, '\/' );
+
+	return '/' . $string;
+}

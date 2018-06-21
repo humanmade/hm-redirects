@@ -79,4 +79,13 @@ class Utilities_Test extends WP_UnitTestCase {
 		$result = Utilities\normalise_url( $original_url );
 		$this->assertInstanceOf( 'WP_Error', $result );
 	}
+
+	/**
+	 * Test `test_add_leading_slash()`.
+	 */
+	public function test_add_leading_slash() {
+		$this->assertSame( '/foo', Utilities\add_leading_slash( 'foo' ) );
+		$this->assertSame( '/foo', Utilities\add_leading_slash( '/foo' ) );
+		$this->assertSame( '/foo', Utilities\add_leading_slash( '//foo' ) );
+	}
 }

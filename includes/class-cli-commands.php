@@ -14,14 +14,16 @@
 
 namespace HM\Redirects\CLI;
 
-use WP_CLI, WP_CLI_Command;
-use HM\Redirects\{Utilities, Handle_Redirects};
 use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
+use HM\Redirects\Handle_Redirects;
+use HM\Redirects\Utilities;
+use WP_CLI;
+use WP_CLI_Command;
 
 /**
  * Handles redirects in a scalable manner.
  */
-class Commands extends WP_CLI_Command {
+class CLI_Commands extends WP_CLI_Command {
 
 	/**
 	 * Find domains redirected to.
@@ -36,7 +38,7 @@ class Commands extends WP_CLI_Command {
 	public function find_domains( array $args, array $assoc_args ) {
 		global $wpdb;
 
-		$domains        = array();
+		$domains        = [];
 		$paged          = 0;
 		$posts_per_page = 500;
 
@@ -65,7 +67,7 @@ class Commands extends WP_CLI_Command {
 				$progress_bar->tick();
 
 				if ( ! empty( $redirect_url ) ) {
-					$redirect_host = parse_url( $redirect_url, PHP_URL_HOST );
+					$redirect_host = wp_parse_url( $redirect_url, PHP_URL_HOST );
 					if ( $redirect_host ) {
 						$domains[] = $redirect_host;
 					}
@@ -88,15 +90,17 @@ class Commands extends WP_CLI_Command {
 	}
 
 	/**
-	 * Insert a single redirect
+	 * Insert a single redirect.
 	 *
-	 * from_url_relative must be relative to the root of the site.
+	 * The from_url_relative must be relative to the root of the site.
 	 *
 	 * @subcommand insert-redirect
 	 * @synopsis <from_url_relative> <to_url_absolute>
 	 *
 	 * @param string[] $args Positional arguments.
 	 * @param string[] $assoc_args Not used.
+	 *
+	 * @throws WP_CLI\ExitException Exception if the post to redirect to does not exist.
 	 */
 	public function insert_redirect( $args, $assoc_args ) {
 		$from = $args[0];
@@ -106,7 +110,6 @@ class Commands extends WP_CLI_Command {
 			if ( ! $to ) {
 				WP_CLI::error( sprintf( 'Destination post %s cannot be found', $args[1] ) );
 			}
-
 		} else {
 			$to = esc_url_raw( $args[1] );
 		}
@@ -114,21 +117,23 @@ class Commands extends WP_CLI_Command {
 		$redirect = Utilities\insert_redirect( $from, $to, 301 );
 
 		if ( is_wp_error( $redirect ) ) {
-			WP_CLI::error( sprintf(
-				"Couldn't insert %s -> %s: %s",
-				$from,
-				$to,
-				implode( PHP_EOL, $redirect->get_error_messages() )
-			) );
+			WP_CLI::error(
+				sprintf(
+					"Couldn't insert %s -> %s: %s",
+					$from,
+					$to,
+					implode( PHP_EOL, $redirect->get_error_messages() )
+				)
+			);
 		}
 
-		WP_CLI::success( sprintf( "Inserted %s -> %s", $from, $to ) );
+		WP_CLI::success( sprintf( 'Inserted %s -> %s', $from, $to ) );
 	}
 
 	/**
-	 * Bulk import redirects from a CSV file matching the following structure:
+	 * Bulk import redirects from a CSV file.
 	 *
-	 * redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url)
+	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url)
 	 *
 	 * ## OPTIONS
 	 *
@@ -150,6 +155,8 @@ class Commands extends WP_CLI_Command {
 	 *
 	 * @param string[] $args Positional arguments.
 	 * @param string[] $assoc_args Associative arguments.
+	 *
+	 * @throws WP_CLI\ExitException If the CSV file cannot be opened.
 	 */
 	public function import_from_csv( $args, $assoc_args ) {
 		define( 'WP_IMPORTING', true );
@@ -171,24 +178,24 @@ class Commands extends WP_CLI_Command {
 			WP_CLI::error( "Cannot open 'csv' file" );
 		}
 
-		$notices = array();
+		$notices = [];
 		$row     = 0;
 
-		while ( ( $data = fgetcsv( $handle, 2000, "," ) ) !== false ) {
+		while ( ( $data = fgetcsv( $handle, 2000, ',' ) ) !== false ) {
 			$row++;
-			$redirect_from = $data[ 0 ];
-			$redirect_to   = $data[ 1 ];
+			$redirect_from = $data[0];
+			$redirect_to   = $data[1];
 
 			// Convert "redirect to" post IDs to permalinks.
 			if ( ctype_digit( $redirect_to ) ) {
 				$redirect_to = get_permalink( (int) $redirect_to );
 
 				if ( ! $redirect_to ) {
-					$notices[] = array(
+					$notices[] = [
 						'redirect_from' => $redirect_from,
-						'redirect_to'   => $data[ 1 ],
+						'redirect_to'   => $data[1],
 						'message'       => 'Skipped - could not find redirect_to post',
-					);
+					];
 
 					continue;
 				}
@@ -209,22 +216,22 @@ class Commands extends WP_CLI_Command {
 
 			// Record any error notices.
 			if ( is_wp_error( $redirect ) ) {
-				$notices[] = array(
+				$notices[] = [
 					'redirect_from' => $redirect_from,
 					'redirect_to'   => $redirect_to,
 					'message'       => sprintf(
 						'Could not insert redirect: %s',
 						implode( PHP_EOL, $redirect->get_error_messages() )
 					),
-				);
+				];
 
-			// Record success notices.
+				// Record success notices.
 			} elseif ( $verbose ) {
-				$notices[] = array(
+				$notices[] = [
 					'redirect_from' => $redirect_from,
 					'redirect_to'   => $redirect_to,
 					'message'       => 'Successfully imported',
-				);
+				];
 			}
 
 			if ( 0 === $row % 100 ) {
@@ -238,9 +245,11 @@ class Commands extends WP_CLI_Command {
 		fclose( $handle );
 
 		if ( count( $notices ) > 0 ) {
-			WP_CLI\Utils\format_items( $format, $notices, array( 'redirect_from', 'redirect_to', 'message' ) );
+			WP_CLI\Utils\format_items( $format, $notices, [ 'redirect_from', 'redirect_to', 'message' ] );
 		} else {
-			echo WP_CLI::colorize( "%GAll of your redirects have been imported. Nice work!%n " );
+			// phpcs:disable WordPress.XSS.EscapeOutput
+			echo WP_CLI::colorize( '%GAll of your redirects have been imported. Nice work!%n ' );
+			// phpcs:enable
 		}
 	}
 
@@ -284,7 +293,8 @@ class Commands extends WP_CLI_Command {
 
 		$meta_key   = isset( $assoc_args['meta_key'] ) ? sanitize_key( $assoc_args['meta_key'] ) : 'change-me';
 		$offset     = isset( $assoc_args['start'] ) ? intval( $assoc_args['start'] ) : 0;
-		$end_offset = isset( $assoc_args['end'] ) ? intval( $assoc_args['end'] ) : 99999999;;
+		$end_offset = isset( $assoc_args['end'] ) ? intval( $assoc_args['end'] ) : 99999999;
+		;
 
 		$skip_dupes = isset( $assoc_args['skip_dupes'] ) ? (bool) intval( $assoc_args['skip_dupes'] ) : false;
 		$dry_run    = isset( $assoc_args['dry_run'] );
@@ -310,7 +320,7 @@ class Commands extends WP_CLI_Command {
 		}
 
 		$progress_bar = WP_CLI\Utils\make_progress_bar( sprintf( 'Importing %s redirects', number_format( $total_redirects ) ), $total_redirects );
-		$notices      = array();
+		$notices      = [];
 
 		// Start the import; loop through batches of posts.
 		do {
@@ -340,15 +350,14 @@ class Commands extends WP_CLI_Command {
 				// The "redirect to" value is a post ID. Grab the appropriate URL.
 				$redirect_to = get_permalink( (int) $redirect->redirect_to_post_id );
 				if ( ! $redirect_to ) {
-					$notices[] = array(
+					$notices[] = [
 						'redirect_from' => $redirect_from,
 						'redirect_to'   => $redirect->redirect_to_post_id,
 						'message'       => 'Skipped - could not find redirect_to post',
-					);
+					];
 
 					continue;
 				}
-
 
 				if ( $skip_dupes ) {
 					$has_existing_redirect = Handle_Redirects\get_redirect_post( $redirect_from );
@@ -356,11 +365,11 @@ class Commands extends WP_CLI_Command {
 
 					if ( $has_existing_redirect ) {
 						if ( $verbose ) {
-							$notices[] = array(
+							$notices[] = [
 								'redirect_from' => $redirect_from,
 								'redirect_to'   => $redirect_to,
 								'message'       => sprintf( 'Skipped - "redirect from" URL already exists (%s)', $redirect_from ),
-							);
+							];
 						}
 
 						continue;
@@ -377,22 +386,22 @@ class Commands extends WP_CLI_Command {
 
 					// Record any error notices.
 					if ( is_wp_error( $redirect ) ) {
-						$notices[] = array(
+						$notices[] = [
 							'redirect_from' => $redirect_from,
 							'redirect_to'   => $redirect_to,
 							'message'       => sprintf(
 								'Could not insert redirect: %s',
 								implode( PHP_EOL, $redirect->get_error_messages() )
 							),
-						);
+						];
 
-					// Record success notices.
+						// Record success notices.
 					} elseif ( $verbose ) {
-						$notices[] = array(
+						$notices[] = [
 							'redirect_from' => $redirect_from,
 							'redirect_to'   => $redirect_to,
 							'message'       => 'Successfully imported',
-						);
+						];
 					}
 				}
 
@@ -405,14 +414,16 @@ class Commands extends WP_CLI_Command {
 			}
 
 			$offset += 1000;
-		} while( $total >= 1000 && $offset < $end_offset );
+		} while ( $total >= 1000 && $offset < $end_offset );
 
 		$progress_bar->finish();
 
 		if ( count( $notices ) > 0 ) {
-			WP_CLI\Utils\format_items( $format, $notices, array( 'redirect_from', 'redirect_to', 'message' ) );
+			WP_CLI\Utils\format_items( $format, $notices, [ 'redirect_from', 'redirect_to', 'message' ] );
 		} else {
-			echo WP_CLI::colorize( "%GAll of your redirects have been imported. Nice work!%n " );
+			// phpcs:disable WordPress.XSS.EscapeOutput
+			echo WP_CLI::colorize( '%GAll of your redirects have been imported. Nice work!%n ' );
+			// phpcs:enable
 		}
 	}
 }

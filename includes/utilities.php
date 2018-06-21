@@ -9,7 +9,6 @@ namespace HM\Redirects\Utilities;
 
 use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 use WP_Error;
-use WP_Query;
 
 /**
  * Creates an md5 hash from a URL.
@@ -85,10 +84,10 @@ function prefix_path( $url ) {
 /**
  * Add a redirect.
  *
- * @param string $redirect $from Leading-slashed relative URL to redirect away from.
- * @param string $to Absolute URL to redirect to.
- * @param int $status_code HTTP status code for the redirect.
- * @param int $post_id Optional. If set, update that existing redirect.
+ * @param string $from        Leading-slashed relative URL to redirect away from.
+ * @param string $to          Absolute URL to redirect to.
+ * @param int    $status_code HTTP status code for the redirect.
+ * @param int    $post_id     Optional. If set, update that existing redirect.
  *
  * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
@@ -120,18 +119,18 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 function clear_object_cache() {
 	global $wpdb, $wp_object_cache;
 
-	$wpdb->queries = array();
+	$wpdb->queries = [];
 
 	if ( ! is_object( $wp_object_cache ) ) {
 		return;
 	}
 
-	$wp_object_cache->group_ops      = array();
-	$wp_object_cache->stats          = array();
-	$wp_object_cache->memcache_debug = array();
-	$wp_object_cache->cache          = array();
+	$wp_object_cache->group_ops      = [];
+	$wp_object_cache->stats          = [];
+	$wp_object_cache->memcache_debug = [];
+	$wp_object_cache->cache          = [];
 
 	if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
-		$wp_object_cache->__remoteset(); // important
+		$wp_object_cache->__remoteset();
 	}
 }

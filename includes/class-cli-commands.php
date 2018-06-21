@@ -21,7 +21,7 @@ use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 /**
  * Handles redirects in a scalable manner.
  */
-class Commands extends WP_CLI_Command {
+class CLI_Commands extends WP_CLI_Command {
 
 	/**
 	 * Find domains redirected to.

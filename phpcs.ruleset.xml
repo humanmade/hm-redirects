@@ -29,4 +29,18 @@
         <!-- Don't warn about usages of super globals -->
         <exclude name="WordPress.VIP.SuperGlobalInputUsage" />
     </rule>
+
+    <!-- Selectively apply the VIP direct database query sniff. -->
+    <rule ref="WordPress.VIP.DirectDatabaseQuery">
+        <exclude-pattern>includes/class-cli-commands.php</exclude-pattern>
+    </rule>
+
+    <!-- Selectively apply the VIP direct database query sniff. -->
+    <rule ref="WordPress.VIP.DirectDatabaseQuery">
+        <exclude-pattern>includes/class-cli-commands.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.PHP.DisallowMultipleAssignments.Found">
+        <exclude-pattern>includes/class-cli-commands.php</exclude-pattern>
+    </rule>
 </ruleset>

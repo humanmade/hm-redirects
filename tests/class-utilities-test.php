@@ -16,21 +16,6 @@ use WP_UnitTestCase;
  * @package HM\Redirects\Tests
  */
 class Utilities_Test extends WP_UnitTestCase {
-
-	/**
-	 * Provides valid test URLS.
-	 *
-	 * @return array
-	 */
-	public function provider_normalised_url_valid() {
-		return [
-			[ '/only/the/path', '/only/the/path' ],
-			[ '/a/path/?with=queryparam', '/a/path/?with=queryparam' ],
-			[ '/a/path/withbrakets?foo[bar]=baz', '/a/path/withbrakets?foo[bar]=baz' ],
-			[ '/Mr%20%20WordPress', '/Mr%20%20WordPress' ],
-		];
-	}
-
 	/**
 	 * Provides invalid test URLs.
 	 *
@@ -44,6 +29,28 @@ class Utilities_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Provides valid test URLs.
+	 *
+	 * @return array
+	 */
+	public function provider_normalised_url_valid() {
+		return [
+			// Absolute URL.
+			[ 'http://example.com/path', '/path' ],
+			// Relative URL, with a leading slash.
+			[ '/only/the/path', '/only/the/path' ],
+			// Relative URL, without a leading slash.
+			[ 'only/the/path', 'only/the/path' ],
+			// Relative URL, with query parameter.
+			[ '/a/path/?with=queryparam', '/a/path/?with=queryparam' ],
+			// Relative URL, with query parameter using brackets.
+			[ '/a/path/withbrakets?foo[bar]=baz', '/a/path/withbrakets?foo[bar]=baz' ],
+			// Relative URL, with encoded spaces.
+			[ '/Mr%20%20WordPress', '/Mr%20%20WordPress' ],
+		];
+	}
+
+	/**
 	 * Provides valid test URLS.
 	 *
 	 * @return array
@@ -52,6 +59,50 @@ class Utilities_Test extends WP_UnitTestCase {
 		return [
 			[ '/original-post', '/redirected-post', 301 ],
 			[ '/original-post?with=query-param', '/redirected-post?with=query-param', 303 ],
+		];
+	}
+
+	/**
+	 * Provides absolute and relative ASCII only URLs.
+	 *
+	 * @return array
+	 */
+	public function provider_ascii_urls() {
+		return [
+			// Absolute URL.
+			[ 'http://example.com/path', 'http://example.com/path' ],
+			// Relative URL, with a leading slash.
+			[ '/only/the/path', '/only/the/path' ],
+			// Relative URL, without a leading slash.
+			[ 'only/the/path', '/only/the/path' ],
+			// Relative URL, with query parameter.
+			[ '/a/path/?with=queryparam', '/a/path/?with=queryparam' ],
+			// Relative URL, with query parameter using brackets.
+			[ '/a/path/withbrakets?foo[bar]=baz', '/a/path/withbrakets?foo%5Bbar%5D=baz' ],
+			// Relative URL, with encoded spaces.
+			[ '/Mr%20%20WordPress', '/Mr%20%20WordPress' ],
+		];
+	}
+
+	/**
+	 * Provides absolute and relative internationalised URLs.
+	 *
+	 * @return array
+	 */
+	public function provider_non_ascii_urls() {
+		return [
+			// Absolute URL, URL encoded.
+			[ 'http://example.com/%E3%81%AE%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%81%AE%E5%8F%97%E8%A8%97%E6%89%8B%E8%8D%B7%E7%89%A9*%E3%81%A8', 'http://example.com/の国際線の受託手荷物*と' ],
+			// Relative URL, with leading slash, URL encoded.
+			[ '%2F%E3%81%AE%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%81%AE%E5%8F%97%E8%A8%97%E6%89%8B%E8%8D%B7%E7%89%A9*%E3%81%A8', '/の国際線の受託手荷物*と' ],
+			// Relative URL, without leading slash, URL encoded.
+			[ '%E3%81%AE%E5%9B%BD%E9%9A%9B%E7%B7%9A%E3%81%AE%E5%8F%97%E8%A8%97%E6%89%8B%E8%8D%B7%E7%89%A9*%E3%81%A8', '/の国際線の受託手荷物*と' ],
+			// Absolute URL.
+			[ 'http://example.com/の国際線の受託手荷物*と', 'http://example.com/の国際線の受託手荷物*と' ],
+			// Relative URL, with leading slash.
+			[ '/の国際線の受託手荷物*と', '/の国際線の受託手荷物*と' ],
+			// Relative URL, without leading slash.
+			[ 'の国際線の受託手荷物*と', '/の国際線の受託手荷物*と' ],
 		];
 	}
 
@@ -87,5 +138,18 @@ class Utilities_Test extends WP_UnitTestCase {
 		$this->assertSame( '/foo', Utilities\add_leading_slash( 'foo' ) );
 		$this->assertSame( '/foo', Utilities\add_leading_slash( '/foo' ) );
 		$this->assertSame( '/foo', Utilities\add_leading_slash( '//foo' ) );
+	}
+
+	/**
+	 * Test `sanitise_and_normalise_url()` with ASCII and non-ASCII URLs.
+	 *
+	 * @dataProvider provider_non_ascii_urls
+	 * @dataProvider provider_ascii_urls
+	 *
+	 * @param string $original_url Original URL.
+	 * @param string $expected_url Expected URL.
+	 */
+	public function test_sanitise_and_normalise_url( $original_url, $expected_url ) {
+		$this->assertSame( $expected_url, Utilities\sanitise_and_normalise_url( $original_url ) );
 	}
 }

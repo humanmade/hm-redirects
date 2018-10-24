@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 0.4.1 =
+* Use `get_page_by_path()` instead of a `WP_Query` in `get_redirect_post()`. The `get_page_by_path()` function uses
+  an object cache bucket for post paths to id matches, therefore potentially speeding up the lookup.
+
 = 0.4 =
 * Remove usage of `filter_var()` to support domains with non-ASCII characters.
 

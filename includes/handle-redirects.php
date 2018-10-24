@@ -138,17 +138,11 @@ function get_redirect_status_code( $url = '' ) {
  * @return int|null|string
  */
 function get_redirect_post( $url ) {
-	$url_hash = Utilities\get_url_hash( $url );
-
-	$query = new WP_Query( [
-		'posts_per_page' => 1,
-		'post_type'      => Redirects_Post_Type\SLUG,
-		'name'           => $url_hash,
-		'post_status'    => 'publish',
-		'no_found_rows'  => true,
-	] );
-
-	$redirect_post = $query->have_posts() ? current( $query->get_posts() ) : null;
+	$url_hash      = Utilities\get_url_hash( $url );
+	$redirect_post = get_page_by_path( $url_hash, OBJECT, [ Redirects_Post_Type\SLUG ] );
+	if ( 'publish' !== get_post_status( $redirect_post ) ) {
+		return null;
+	}
 
 	return $redirect_post;
 }

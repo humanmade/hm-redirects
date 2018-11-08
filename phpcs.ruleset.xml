@@ -28,6 +28,8 @@
         <exclude name="WordPress.PHP.YodaConditions" />
         <!-- Don't warn about usages of super globals -->
         <exclude name="WordPress.VIP.SuperGlobalInputUsage" />
+        <!-- Don't warn about previously uncached function get_page_by_path -->
+        <exclude name="WordPress.VIP.RestrictedFunctions.get_page_by_path_get_page_by_path" />
     </rule>
 
     <!-- Selectively apply the VIP direct database query sniff. -->

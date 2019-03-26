@@ -77,10 +77,7 @@ function maybe_do_redirect() {
  * @return false|string Redirect-sanitised URL, or false if no valid redirect matched.
  */
 function get_redirect_uri( $url ) {
-	$url = Utilities\normalise_url( $url );
-	if ( is_wp_error( $url ) ) {
-		return false;
-	}
+	$url = Utilities\sanitise_and_normalise_url( $url );
 
 	$redirect_post = get_redirect_post( $url );
 	if ( is_null( $redirect_post ) ) {

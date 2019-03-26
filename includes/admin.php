@@ -92,13 +92,39 @@ function handle_redirect_saving( $post_id ) {
 		return false;
 	}
 
-	$from        = isset( $_POST['hm_redirects_from_url'] ) ? sanitize_text_field( wp_unslash( $_POST['hm_redirects_from_url'] ) ) : '';
-	$to          = isset( $_POST['hm_redirects_to_url'] ) ? esc_url_raw( wp_unslash( $_POST['hm_redirects_to_url'] ) ) : '';
-	$status_code = isset( $_POST['hm_redirects_status_code'] ) ? (int) $_POST['hm_redirects_status_code'] : 302;
+	if ( ! isset( $_POST['hm_redirects_from_url'] ) || ! isset( $_POST['hm_redirects_to_url'] ) || ! isset( $_POST['hm_redirects_status_code'] ) ) {
+		return false;
+	}
 
-	$redirect_id = Utilities\insert_redirect( $from, $to, $status_code, $post_id );
+	// phpcs:disable WordPress.VIP.ValidatedSanitizedInput
+	// We're using a custom sanitisation function.
+	$data = sanitise_and_normalise_redirect_data(
+		wp_unslash( $_POST['hm_redirects_from_url'] ),
+		wp_unslash( $_POST['hm_redirects_to_url'] ),
+		wp_unslash( $_POST['hm_redirects_status_code'] )
+	);
+	// phpcs:enable
+
+	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $post_id );
 
 	return $redirect_id === $post_id;
+}
+
+/**
+ * Sanitise and normalise data for a redirect post.
+ *
+ * @param string $unsafe_from        From URL.
+ * @param string $unsafe_to          To URL.
+ * @param string $unsafe_status_code HTTP status code.
+ *
+ * @return array
+ */
+function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code ) {
+	return [
+		'from_url'    => Utilities\sanitise_and_normalise_url( $unsafe_from ),
+		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
+		'status_code' => absint( $unsafe_status_code ),
+	];
 }
 
 /**

@@ -22,6 +22,38 @@ function get_url_hash( $url ) {
 }
 
 /**
+ * This function sanitises, and normalises URLs:
+ * - Decodes non ASCII characters, so that URLs are always decoded.
+ * - Ensures that paths always have a leading slash.
+ * - Passes the URL through `esc_url_raw()`.
+ *
+ * @param string $unsafe_url URL to process and sanitise.
+ *
+ * @return string Processed and sanitised URL.
+ */
+function sanitise_and_normalise_url( $unsafe_url ) {
+	// Verify whether the URL is encoded. If so, encode it, to be consistent.
+	// This regular expression was extracted from `wp_sanitize_text_field()`.
+	if ( preg_match( '/%[a-fA-F0-9]{2}/i', $unsafe_url ) ) {
+		$unsafe_url = urldecode( $unsafe_url );
+	}
+
+	// Test whether the URL has a scheme (like `https://`) and a domain. This is to determine whether this is an
+	// absolute URL or a relative URL.
+	$url_parts = wp_parse_url( $unsafe_url );
+
+	// If we're dealing with a relative URL, make sure that there's a leading slash before it.
+	if ( empty( $url_parts['scheme'] ) || empty( $url_parts['host'] ) ) {
+		$unsafe_url = add_leading_slash( $unsafe_url );
+	}
+
+	// We now can safely escape the URL.
+	$url = esc_url_raw( $unsafe_url );
+
+	return $url;
+}
+
+/**
  * Takes a request URL and "normalises" it, stripping common elements.
  *
  * Removes scheme and host from the URL, as redirects should be independent of these.
@@ -133,4 +165,19 @@ function clear_object_cache() {
 	if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 		$wp_object_cache->__remoteset();
 	}
+}
+
+/**
+ * Add a leading slash to a string.
+ *
+ * This function ensures that only a single leading slash will be present.
+ *
+ * @param string $string String to add leading slash to.
+ *
+ * @return string String with a single leading slash.
+ */
+function add_leading_slash( $string ) {
+	$string = ltrim( $string, '\/' );
+
+	return '/' . $string;
 }

@@ -127,6 +127,26 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	// Stop loops.
 	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
 
+	/**
+	 * Filter the from URL value before saving to the database.
+	 *
+	 * @param string $from
+	 * @param string $to
+	 * @param int $status_code
+	 * @param int $post_id
+	 */
+	$from = apply_filters( 'hm_redirects_pre_save_from_url', $from, $to, $status_code, $post_id );
+
+	/**
+	 * Filter the from URL value before saving to the database.
+	 *
+	 * @param string $to
+	 * @param string $from
+	 * @param int $status_code
+	 * @param int $post_id
+	 */
+	$to = apply_filters( 'hm_redirects_pre_save_from_url', $to, $from, $status_code, $post_id );
+
 	$result = wp_insert_post(
 		[
 			'ID'                    => $post_id,

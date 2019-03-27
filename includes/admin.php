@@ -51,7 +51,7 @@ function enqueue_scripts() {
 /**
  * Filter the posts listing columns.
  *
- * @param array $columns
+ * @param array $columns List of column ids and labels.
  * @return array
  */
 function filter_posts_columns( array $columns ) : array {
@@ -67,14 +67,14 @@ function filter_posts_columns( array $columns ) : array {
 /**
  * Output for the custom admin columns.
  *
- * @param string $column
- * @param int $post_id
+ * @param string $column Current column ID.
+ * @param int    $post_id Current post ID.
  */
 function posts_columns_content( string $column, int $post_id ) {
 	$post = get_post( $post_id );
 
 	if ( $column === 'to' ) {
-		echo sanitize_text_field( $post->post_excerpt );
+		echo esc_html( sanitize_text_field( $post->post_excerpt ) );
 	}
 
 	if ( $column === 'status' ) {

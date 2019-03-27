@@ -11,6 +11,7 @@
 * Add a filter to modify URLs before they are being saved
 * Set the order of the menu item to sit next to Tools
 * Hide Visibility and Date Settings in the Post Box
+* Fix Redirect Matching with non ASCII URLs
 
 = 0.4.2 =
 * Fix fatal error during WP CLI script execution caused by incorrect class name when calling WP_CLI::add_command

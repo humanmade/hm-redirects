@@ -44,7 +44,7 @@ function register_post_type() {
 			'show_in_feed'        => false,
 			'supports'            => [ 'title' ],
 			'hierarchical'        => false,
-			'public'              => true,
+			'public'              => false,
 			'show_ui'             => true,
 			'show_in_menu'        => true,
 			'menu_position'       => 5,
@@ -57,4 +57,6 @@ function register_post_type() {
 			'publicly_queryable'  => false,
 		]
 	);
+
+	remove_post_type_support( SLUG, 'title' );
 }

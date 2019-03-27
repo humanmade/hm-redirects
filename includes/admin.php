@@ -16,6 +16,7 @@ use WP_Post;
  */
 function setup() {
 	add_action( 'add_meta_boxes', __NAMESPACE__ . '\\add_meta_box' );
+	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts' );
 	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_plugin_textdomain' );
 }
@@ -32,6 +33,17 @@ function add_meta_box() {
 		'normal',
 		'high'
 	);
+}
+
+/**
+ * Enqueue scripts & styles.
+ */
+function enqueue_scripts() {
+	if ( get_current_screen()->post_type !== Redirects_Post_Type\SLUG ) {
+		return;
+	}
+
+	wp_enqueue_style( 'hm-redirects-admin', plugins_url( '/assets/admin.css', dirname( __FILE__ ) ), [], null, 'screen' );
 }
 
 /**
@@ -54,13 +66,13 @@ function output_meta_box( WP_Post $post ) {
 	?>
 	<p>
 		<label for="hm_redirects_from_url"><?php esc_html_e( 'From URL', 'hm-redirects' ); ?></label><br>
-		<input type="text" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $post->post_title ); ?>" class="regular-text code"/>
+		<input type="text" name="hm_redirects_from_url" id="hm_redirects_from_url" value="<?php echo esc_attr( $post->post_title ); ?>" class="code widefat"/>
 	</p>
 	<p class="description"><?php esc_html_e( 'This path should be relative to the root of the site.', 'hm-redirects' ); ?></p>
 
 	<p>
 		<label for="hm_redirects_to_url"><?php esc_html_e( 'To URL', 'hm-redirects' ); ?></label><br>
-		<input type="text" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $post->post_excerpt ); ?>" class="regular-text code"/>
+		<input type="text" name="hm_redirects_to_url" id="hm_redirects_to_url" value="<?php echo esc_attr( $post->post_excerpt ); ?>" class="code widefat"/>
 	</p>
 
 	<p>

@@ -62,7 +62,31 @@ function output_meta_box( WP_Post $post ) {
 		404 => 'Not Found',
 	];
 
-	$status_code = ! empty( $post->post_content_filtered ) ? $post->post_content_filtered : 302;
+	/**
+	 * Filter available status codes.
+	 *
+	 * The array keys are the status code and the values are the labels.
+	 *
+	 * Use this filter to modify the labels or remove options.
+	 *
+	 * @param array $status_code_labels Array of status codes and labels.
+	 */
+	$status_code_labels = apply_filters( 'hm_redirects_status_codes', $status_code_labels );
+
+	/**
+	 * Filter the default selected status code.
+	 *
+	 * Defaults to 302.
+	 *
+	 * @param int $default_status_code
+	 */
+	$default_status_code = apply_filters( 'hm_redirects_default_status_code', 302 );
+
+	if ( ! in_array( $default_status_code, $valid_status_codes, true ) ) {
+		$default_status_code = 302;
+	}
+
+	$status_code = ! empty( $post->post_content_filtered ) ? $post->post_content_filtered : $default_status_code;
 	?>
 	<p>
 		<label for="hm_redirects_from_url"><?php esc_html_e( 'From URL', 'hm-redirects' ); ?></label><br>

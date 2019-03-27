@@ -145,7 +145,7 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	 * @param int $status_code
 	 * @param int $post_id
 	 */
-	$to = apply_filters( 'hm_redirects_pre_save_from_url', $to, $from, $status_code, $post_id );
+	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
 
 	$result = wp_insert_post(
 		[

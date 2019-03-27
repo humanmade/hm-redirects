@@ -47,7 +47,7 @@ function register_post_type() {
 			'public'              => false,
 			'show_ui'             => true,
 			'show_in_menu'        => true,
-			'menu_position'       => 5,
+			'menu_position'       => 75,
 			'menu_icon'           => 'dashicons-migrate',
 			'show_in_admin_bar'   => true,
 			'show_in_nav_menus'   => false,

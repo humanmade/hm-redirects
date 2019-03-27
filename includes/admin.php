@@ -17,8 +17,10 @@ use WP_Post;
 function setup() {
 	add_action( 'add_meta_boxes', __NAMESPACE__ . '\\add_meta_box' );
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts' );
-	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
+	add_action( 'manage_' . Redirects_Post_Type\SLUG . '_posts_custom_column', __NAMESPACE__ . '\\posts_columns_content', 10, 2 );
+	add_filter( 'manage_' . Redirects_Post_Type\SLUG . '_posts_columns', __NAMESPACE__ . '\\filter_posts_columns' );
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_plugin_textdomain' );
+	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
 }
 
 /**
@@ -44,6 +46,40 @@ function enqueue_scripts() {
 	}
 
 	wp_enqueue_style( 'hm-redirects-admin', plugins_url( '/assets/admin.css', dirname( __FILE__ ) ), [], null, 'screen' );
+}
+
+/**
+ * Filter the posts listing columns.
+ *
+ * @param array $columns
+ * @return array
+ */
+function filter_posts_columns( array $columns ) : array {
+	$columns = [
+		'title' => __( 'From', 'hm-redirects' ),
+		'to' => __( 'To', 'hm-redirects' ),
+		'status' => __( 'Status', 'hm-redirects' ),
+		'date' => __( 'Date' ),
+	];
+	return $columns;
+}
+
+/**
+ * Output for the custom admin columns.
+ *
+ * @param string $column
+ * @param int $post_id
+ */
+function posts_columns_content( string $column, int $post_id ) {
+	$post = get_post( $post_id );
+
+	if ( $column === 'to' ) {
+		echo sanitize_text_field( $post->post_excerpt );
+	}
+
+	if ( $column === 'status' ) {
+		echo intval( $post->post_content_filtered );
+	}
 }
 
 /**
@@ -157,7 +193,7 @@ function handle_redirect_saving( $post_id ) {
  */
 function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code ) {
 	return [
-		'from_url'    => Utilities\sanitise_and_normalise_url( $unsafe_from ),
+		'from_url'    => Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $unsafe_from ) ),
 		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
 		'status_code' => absint( $unsafe_status_code ),
 	];

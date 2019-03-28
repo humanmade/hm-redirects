@@ -32,10 +32,6 @@ function maybe_do_redirect() {
 
 	$path = untrailingslashit( str_replace( wp_parse_url( home_url(), PHP_URL_PATH ), '', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
 
-	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
-		$path .= '?' . sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) );
-	}
-
 	/**
 	 * Filter the request path before searching for a matching redirect.
 	 *

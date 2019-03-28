@@ -44,10 +44,10 @@ function register_post_type() {
 			'show_in_feed'        => false,
 			'supports'            => [ 'title' ],
 			'hierarchical'        => false,
-			'public'              => true,
+			'public'              => false,
 			'show_ui'             => true,
 			'show_in_menu'        => true,
-			'menu_position'       => 5,
+			'menu_position'       => 75,
 			'menu_icon'           => 'dashicons-migrate',
 			'show_in_admin_bar'   => true,
 			'show_in_nav_menus'   => false,
@@ -57,4 +57,6 @@ function register_post_type() {
 			'publicly_queryable'  => false,
 		]
 	);
+
+	remove_post_type_support( SLUG, 'title' );
 }

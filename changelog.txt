@@ -1,5 +1,18 @@
 == Changelog ==
 
+= 0.5.0 =
+* Fix redirect CPT to be private #26
+* Add filters to modify the contents of the HTTP Status Code drop down #21
+* Sanitise full from URL to relative path #16
+* Fix redirects with query arguments bug #15
+* Remove title field from Post Edit screen #14
+* Improve Redirect listing screen #13
+* Increase the size of the From and To URL fields #12
+* Add a filter to modify URLs before they are being saved #11
+* Set the order of the menu item to sit next to Tools #6
+* Hide Visibility and Date Settings in the Post Box #1
+* Fix Redirect Matching with non ASCII URLs #24
+
 = 0.4.2 =
 * Fix fatal error during WP CLI script execution caused by incorrect class name when calling WP_CLI::add_command
 * Fix php linting errors

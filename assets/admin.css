@@ -1,3 +1,10 @@
+/**
+ * HM Redirects Admin Styles.
+ */
+
+/* Hide unnecessary elements of the default post edit screen. */
 #post-body-content,
-#submitdiv .misc-pub-visibility,
-#submitdiv .misc-pub-curtime { display: none; }
+#submitdiv .misc-pub-curtime,
+#submitdiv .misc-pub-visibility {
+	display: none;
+}

@@ -61,6 +61,7 @@ function filter_posts_columns( array $columns ) : array {
 		'status' => __( 'Status', 'hm-redirects' ),
 		'date' => __( 'Date' ),
 	];
+
 	return $columns;
 }
 
@@ -74,7 +75,7 @@ function posts_columns_content( string $column, int $post_id ) {
 	$post = get_post( $post_id );
 
 	if ( $column === 'to' ) {
-		echo esc_html( sanitize_text_field( $post->post_excerpt ) );
+		echo esc_html( $post->post_excerpt );
 	}
 
 	if ( $column === 'status' ) {
@@ -101,20 +102,14 @@ function output_meta_box( WP_Post $post ) {
 	/**
 	 * Filter available status codes.
 	 *
-	 * The array keys are the status code and the values are the labels.
-	 *
-	 * Use this filter to modify the labels or remove options.
-	 *
-	 * @param array $status_code_labels Array of status codes and labels.
+	 * @param array $status_code_labels Array of status codes and labels. The array keys are the status code and the values are the labels.
 	 */
 	$status_code_labels = apply_filters( 'hm_redirects_status_codes', $status_code_labels );
 
 	/**
 	 * Filter the default selected status code.
 	 *
-	 * Defaults to 302.
-	 *
-	 * @param int $default_status_code
+	 * @param int $default_status_code Defaults to 302.
 	 */
 	$default_status_code = apply_filters( 'hm_redirects_default_status_code', 302 );
 

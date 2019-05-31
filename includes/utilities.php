@@ -88,6 +88,9 @@ function normalise_url( $url ) {
 	// Note this strips hashes (#) too.
 	$normalised_url = $components['path'];
 
+	// Remove any trailing slashes.
+	$normalised_url = untrailingslashit( $normalised_url );
+
 	// Only append '?' and the query if there is one.
 	if ( ! empty( $components['query'] ) ) {
 		$normalised_url = $components['path'] . '?' . $components['query'];

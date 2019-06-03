@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 0.5.1 =
+* Fix no trailing slash bug #34
+
 = 0.5.0 =
 * Fix redirect CPT to be private #26
 * Add filters to modify the contents of the HTTP Status Code drop down #21

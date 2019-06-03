@@ -5,7 +5,7 @@
  * @package hm-redirects
  *
  * Description: Handles redirects in a scalable manner.
- * Version: 0.5.0
+ * Version: 0.5.1
  * Author: Human Made Limited
  * Author URI: https://humanmade.com/
  * Text Domain: hm-redirects

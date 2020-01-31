@@ -154,7 +154,7 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 		[
 			'ID'                    => $post_id,
 			'post_content_filtered' => $status_code,
-			'post_excerpt'          => strtolower( $to ),
+			'post_excerpt'          => $to,
 			'post_name'             => get_url_hash( $from ),
 			'post_status'           => 'publish',
 			'post_title'            => strtolower( $from ),

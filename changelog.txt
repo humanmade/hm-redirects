@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 0.5.2 =
+* Save URLs as provided rather than lowercasing them #38
+
 = 0.5.1 =
 * Fix no trailing slash bug #34
 

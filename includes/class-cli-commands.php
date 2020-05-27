@@ -185,6 +185,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$row++;
 			$redirect_from = $data[0];
 			$redirect_to   = $data[1];
+			$status        = $data[2] ?? 301;
 
 			// Convert "redirect to" post IDs to permalinks.
 			if ( ctype_digit( $redirect_to ) ) {
@@ -211,7 +212,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$redirect = Utilities\insert_redirect(
 				$redirect_from,
 				esc_url_raw( $redirect_to ),
-				301
+				$status
 			);
 
 			// Record any error notices.

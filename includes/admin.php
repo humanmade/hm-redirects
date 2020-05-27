@@ -19,6 +19,7 @@ function setup() {
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts' );
 	add_action( 'manage_' . Redirects_Post_Type\SLUG . '_posts_custom_column', __NAMESPACE__ . '\\posts_columns_content', 10, 2 );
 	add_filter( 'manage_' . Redirects_Post_Type\SLUG . '_posts_columns', __NAMESPACE__ . '\\filter_posts_columns' );
+	add_filter( 'post_row_actions', __NAMESPACE__ . '\\row_actions', 10, 2 );
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_plugin_textdomain' );
 	add_action( 'save_post', __NAMESPACE__ . '\\handle_redirect_saving', 13 );
 }
@@ -81,6 +82,32 @@ function posts_columns_content( string $column, int $post_id ) {
 	if ( $column === 'status' ) {
 		echo intval( $post->post_content_filtered );
 	}
+}
+
+/**
+ * Add a new action to visit the redirected link.
+ *
+ * @param array   $actions Current row actions.
+ * @param WP_Post $post Current row post.
+ */
+function row_actions( $actions, $post ) {
+	if ( $post->post_status === 'trash' ) {
+		return $actions;
+	}
+
+	$url = get_the_title( $post );
+	$aria_label = esc_html( sprintf( __( 'Visit %s', 'hm-redirects'), $url ) );
+	return array_merge(
+		[
+			'visit' => sprintf(
+				'<a target="_blank" href="%s" aria-label="%s">%s</a>',
+				esc_url( $url ),
+				$aria_label,
+				esc_html__( 'Visit', 'hm-redirects')
+			),
+		],
+		$actions
+	);
 }
 
 /**

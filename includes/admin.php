@@ -96,7 +96,6 @@ function row_actions( $actions, $post ) {
 	}
 
 	$url = get_the_title( $post );
-	$url = get_the_title( $post );
 	/* translators: %s: Redirect source URL */
 	$aria_label = esc_html( sprintf( __( 'Visit %s', 'hm-redirects' ), $url ) );
 	return array_merge(

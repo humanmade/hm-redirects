@@ -212,7 +212,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$redirect = Utilities\insert_redirect(
 				$redirect_from,
 				esc_url_raw( $redirect_to ),
-				$status
+				absint( $status )
 			);
 
 			// Record any error notices.

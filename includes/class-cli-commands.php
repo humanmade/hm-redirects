@@ -133,7 +133,7 @@ class CLI_Commands extends WP_CLI_Command {
 	/**
 	 * Bulk import redirects from a CSV file.
 	 *
-	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url)
+	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url),[status_code default:301]
 	 *
 	 * ## OPTIONS
 	 *

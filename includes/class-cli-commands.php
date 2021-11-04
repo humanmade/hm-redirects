@@ -92,10 +92,22 @@ class CLI_Commands extends WP_CLI_Command {
 	/**
 	 * Insert a single redirect.
 	 *
-	 * The from_url_relative must be relative to the root of the site.
+	 * ## OPTIONS
+	 *
+	 * <from_url_relative>
+	 * : URL to redirect from. Must be relative to the root of the site.
+	 *
+	 * <to_url_relative>
+	 * : Destination URL to redirect to, or post ID.
+	 *
+	 * [--code=<code>]
+	 * : Redirect code to use.
+	 * ---
+	 * default: 302
+	 * ---
 	 *
 	 * @subcommand insert-redirect
-	 * @synopsis <from_url_relative> <to_url_absolute>
+	 * @synopsis <from_url_relative> <to_url_absolute> [--code=<code>]
 	 *
 	 * @param string[] $args Positional arguments.
 	 * @param string[] $assoc_args Not used.
@@ -104,6 +116,14 @@ class CLI_Commands extends WP_CLI_Command {
 	 */
 	public function insert_redirect( $args, $assoc_args ) {
 		$from = $args[0];
+		if ( ! ctype_digit( $assoc_args['code'] ) ) {
+			WP_CLI::error( sprintf( 'Code must be numeric, "%s" is invalid', $assoc_args['code'] ) );
+		}
+
+		$code = (int) $assoc_args['code'];
+		if ( $code < 300 || $code >= 400 ) {
+			WP_CLI::error( sprintf( 'Code must be a 3XX status code for redirects, %d is invalid', $code ) );
+		}
 
 		if ( ctype_digit( $args[1] ) ) {
 			$to = get_permalink( (int) $args[1] );
@@ -114,7 +134,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$to = esc_url_raw( $args[1] );
 		}
 
-		$redirect = Utilities\insert_redirect( $from, $to, 301 );
+		$redirect = Utilities\insert_redirect( $from, $to, $code );
 
 		if ( is_wp_error( $redirect ) ) {
 			WP_CLI::error(

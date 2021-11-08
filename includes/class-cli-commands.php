@@ -133,7 +133,7 @@ class CLI_Commands extends WP_CLI_Command {
 	/**
 	 * Bulk import redirects from a CSV file.
 	 *
-	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url)
+	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url),[status_code default:301]
 	 *
 	 * ## OPTIONS
 	 *
@@ -185,6 +185,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$row++;
 			$redirect_from = $data[0];
 			$redirect_to   = $data[1];
+			$status        = $data[2] ?? 301;
 
 			// Convert "redirect to" post IDs to permalinks.
 			if ( ctype_digit( $redirect_to ) ) {
@@ -211,7 +212,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$redirect = Utilities\insert_redirect(
 				$redirect_from,
 				esc_url_raw( $redirect_to ),
-				301
+				absint( $status )
 			);
 
 			// Record any error notices.

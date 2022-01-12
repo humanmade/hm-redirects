@@ -60,6 +60,7 @@ function filter_posts_columns( array $columns ) : array {
 		'title' => __( 'From', 'hm-redirects' ),
 		'to' => __( 'To', 'hm-redirects' ),
 		'status' => __( 'Status', 'hm-redirects' ),
+		'preserve_urls' => __( 'Preserve URL Param\'s', 'hm-redirects' ),
 		'date' => __( 'Date' ),
 	];
 
@@ -81,6 +82,11 @@ function posts_columns_content( string $column, int $post_id ) {
 
 	if ( $column === 'status' ) {
 		echo intval( $post->post_content_filtered );
+	}
+
+	if ( $column === 'preserve_urls' ) {
+		$icon = ( get_post_meta( $post->ID, 'preserve_parameters', true ) ? 'dashicons-yes' : 'dashicons-no' );
+		echo '<span class="dashicons '. $icon .'"></span>';
 	}
 }
 
@@ -146,6 +152,8 @@ function output_meta_box( WP_Post $post ) {
 	}
 
 	$status_code = ! empty( $post->post_content_filtered ) ? $post->post_content_filtered : $default_status_code;
+	$preserve_url = get_post_meta( $post->ID, 'preserve_parameters', true );
+
 	?>
 	<p>
 		<label for="hm_redirects_from_url"><?php esc_html_e( 'From URL', 'hm-redirects' ); ?></label><br>
@@ -167,6 +175,10 @@ function output_meta_box( WP_Post $post ) {
 		</select>
 		<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'hm-redirects' ); ?></em>
 	</p>
+	<p>
+		<input type="checkbox" name="hm_redirects_parameters" id="hm_redirects_parameters" value="1" <?php echo ( $preserve_url ? 'checked' : ''  );?> />
+		<label for="hm_redirects_parameters"><?php esc_html_e( 'Preserve URL parameters?', 'hm-redirects' ); ?></label>
+	</p>
 	<?php
 	wp_nonce_field( 'hm_redirects', 'hm_redirects_nonce' );
 }
@@ -179,6 +191,7 @@ function output_meta_box( WP_Post $post ) {
  * @return bool Whether the redirect was saved successfully.
  */
 function handle_redirect_saving( $post_id ) {
+
 	if ( ! isset( $_POST['hm_redirects_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['hm_redirects_nonce'] ) ), 'hm_redirects' ) ) {
 		return false;
 	}
@@ -187,7 +200,7 @@ function handle_redirect_saving( $post_id ) {
 		return false;
 	}
 
-	if ( ! isset( $_POST['hm_redirects_from_url'] ) || ! isset( $_POST['hm_redirects_to_url'] ) || ! isset( $_POST['hm_redirects_status_code'] ) ) {
+	if ( ! isset( $_POST['hm_redirects_from_url'] ) || ! isset( $_POST['hm_redirects_to_url'] ) ) {
 		return false;
 	}
 
@@ -196,11 +209,12 @@ function handle_redirect_saving( $post_id ) {
 	$data = sanitise_and_normalise_redirect_data(
 		wp_unslash( $_POST['hm_redirects_from_url'] ),
 		wp_unslash( $_POST['hm_redirects_to_url'] ),
-		wp_unslash( $_POST['hm_redirects_status_code'] )
+		wp_unslash( $_POST['hm_redirects_status_code'] ),
+		wp_unslash( isset( $_POST['hm_redirects_parameters'] ) ?: '' ),
 	);
 	// phpcs:enable
 
-	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $post_id );
+	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $post_id, $data['preserve'] );
 
 	return $redirect_id === $post_id;
 }
@@ -211,14 +225,16 @@ function handle_redirect_saving( $post_id ) {
  * @param string $unsafe_from        From URL.
  * @param string $unsafe_to          To URL.
  * @param string $unsafe_status_code HTTP status code.
+ * @param bool $unsafe_preserve_parameters	Preserve URL Parameters.
  *
  * @return array
  */
-function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code ) {
+function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code, $unsafe_preserve_parameters ) {
 	return [
 		'from_url'    => Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $unsafe_from ) ),
 		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
 		'status_code' => absint( $unsafe_status_code ),
+		'preserve'    => $unsafe_preserve_parameters,
 	];
 }
 

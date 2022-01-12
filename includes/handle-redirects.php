@@ -88,8 +88,8 @@ function get_redirect_uri( $url ) {
 	// If the URL is only a path, prefix it with the `home_url()`.
 	$to_url = Utilities\prefix_path( $to_url );
 
-	// If there were any paramters in the original URL, append them to the new URL.
-	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+	// If there were any paramters in the original URL and preserve parameters is true, append them to the new URL.
+	if ( ! empty( $_SERVER['QUERY_STRING'] ) && get_post_meta( $redirect_post->ID, 'preserve_parameters', true ) ) {
 		$to_url .= '/?'.$_SERVER['QUERY_STRING'];
 	}
 

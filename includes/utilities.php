@@ -126,10 +126,11 @@ function prefix_path( $url ) {
  * @param string $to          Absolute URL to redirect to.
  * @param int    $status_code HTTP status code for the redirect.
  * @param int    $post_id     Optional. If set, update that existing redirect.
+ * @param bool   $preserve_parameters	Preserve URL parameters.
  *
  * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
-function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
+function insert_redirect( $from, $to, $status_code, $post_id = 0, $preserve_parameters = 0 ) {
 	// Stop loops.
 	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
 
@@ -162,6 +163,9 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 			'post_status'           => 'publish',
 			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
+			'meta_input' => [
+				'preserve_parameters' => $preserve_parameters ?: '',
+			]
 		],
 		true
 	);

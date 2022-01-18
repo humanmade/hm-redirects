@@ -106,8 +106,14 @@ class CLI_Commands extends WP_CLI_Command {
 	 * default: 302
 	 * ---
 	 *
+	 * [--preserve=<preserve>]
+	 * : Preserve URL parameters.
+	 * ---
+	 * default: 0
+	 * ---
+	 *
 	 * @subcommand insert-redirect
-	 * @synopsis <from_url_relative> <to_url_absolute> [--code=<code>]
+	 * @synopsis <from_url_relative> <to_url_absolute> [--code=<code>] [--preserve=<preserve>]
 	 *
 	 * @param string[] $args Positional arguments.
 	 * @param string[] $assoc_args Not used.
@@ -134,7 +140,12 @@ class CLI_Commands extends WP_CLI_Command {
 			$to = esc_url_raw( $args[1] );
 		}
 
-		$redirect = Utilities\insert_redirect( $from, $to, $code );
+		$preserve_parameters = (bool) $assoc_args['preserve'];
+		if ( ! is_bool( $preserve_parameters ) ){
+			WP_CLI::error( sprintf( 'In order to preserve the parameters on a URL, the value must be a boolean, %d is invalid', $preserve_parameters ) );
+		}
+
+		$redirect = Utilities\insert_redirect( $from, $to, $code, $preserve_parameters );
 
 		if ( is_wp_error( $redirect ) ) {
 			WP_CLI::error(
@@ -153,7 +164,7 @@ class CLI_Commands extends WP_CLI_Command {
 	/**
 	 * Bulk import redirects from a CSV file.
 	 *
-	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url),[status_code default:301]
+	 * CSV structure: redirect_from_path,(redirect_to_post_id|redirect_to_path|redirect_to_url),[status_code default:301],[preserve_url default:0]
 	 *
 	 * ## OPTIONS
 	 *
@@ -206,6 +217,7 @@ class CLI_Commands extends WP_CLI_Command {
 			$redirect_from = $data[0];
 			$redirect_to   = $data[1];
 			$status        = $data[2] ?? 301;
+			$preserve_url  = $data[3] ?? 0;
 
 			// Convert "redirect to" post IDs to permalinks.
 			if ( ctype_digit( $redirect_to ) ) {
@@ -232,7 +244,8 @@ class CLI_Commands extends WP_CLI_Command {
 			$redirect = Utilities\insert_redirect(
 				Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $redirect_from ) ),
 				Utilities\sanitise_and_normalise_url( $redirect_to ),
-				absint( $status )
+				absint( $status ),
+				$preserve_url
 			);
 
 			// Record any error notices.

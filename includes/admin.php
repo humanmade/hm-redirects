@@ -60,7 +60,7 @@ function filter_posts_columns( array $columns ) : array {
 		'title' => __( 'From', 'hm-redirects' ),
 		'to' => __( 'To', 'hm-redirects' ),
 		'status' => __( 'Status', 'hm-redirects' ),
-		'preserve_urls' => __( 'Preserve URL Param\'s', 'hm-redirects' ),
+		'preserve_urls' => __( 'Preserve URL Parameters', 'hm-redirects' ),
 		'date' => __( 'Date' ),
 	];
 
@@ -200,7 +200,7 @@ function handle_redirect_saving( $post_id ) {
 		return false;
 	}
 
-	if ( ! isset( $_POST['hm_redirects_from_url'] ) || ! isset( $_POST['hm_redirects_to_url'] ) ) {
+	if ( ! isset( $_POST['hm_redirects_from_url'] ) || ! isset( $_POST['hm_redirects_to_url'] ) || ! isset( $_POST['hm_redirects_status_code'] ) ) {
 		return false;
 	}
 

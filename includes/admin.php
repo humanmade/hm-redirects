@@ -214,7 +214,7 @@ function handle_redirect_saving( $post_id ) {
 	);
 	// phpcs:enable
 
-	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $post_id, $data['preserve'] );
+	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $data['preserve'], $post_id );
 
 	return $redirect_id === $post_id;
 }

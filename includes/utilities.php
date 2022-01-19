@@ -131,6 +131,7 @@ function prefix_path( $url ) {
  * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
 function insert_redirect( $from, $to, $status_code, $preserve_parameters = 0, $post_id = 0 ) {
+
 	// Stop loops.
 	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
 
@@ -153,6 +154,8 @@ function insert_redirect( $from, $to, $status_code, $preserve_parameters = 0, $p
 	 * @param int $post_id The post ID for the redirect.
 	 */
 	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
+
+	$preserve_parameters = filter_var( $preserve_parameters, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
 
 	$result = wp_insert_post(
 		[

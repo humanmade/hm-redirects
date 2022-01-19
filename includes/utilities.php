@@ -167,7 +167,7 @@ function insert_redirect( $from, $to, $status_code, $preserve_parameters = 0, $p
 			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
 			'meta_input' => [
-				'preserve_parameters' => $preserve_parameters ?: '',
+				'preserve_parameters' => is_bool( $preserve_parameters ) ? $preserve_parameters : '',
 			]
 		],
 		true

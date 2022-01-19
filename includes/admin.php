@@ -179,6 +179,7 @@ function output_meta_box( WP_Post $post ) {
 		<input type="checkbox" name="hm_redirects_parameters" id="hm_redirects_parameters" value="1" <?php echo ( $preserve_url ? 'checked' : ''  );?> />
 		<label for="hm_redirects_parameters"><?php esc_html_e( 'Preserve URL parameters?', 'hm-redirects' ); ?></label>
 	</p>
+	<p class="description"><?php esc_html_e( 'By default, query parameters (e.g. ?utm_campaign=x) will be removed when redirecting. Enable this option to preserve these parameters when redirecting.', 'hm-redirects' ); ?></p>
 	<?php
 	wp_nonce_field( 'hm_redirects', 'hm_redirects_nonce' );
 }

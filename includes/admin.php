@@ -60,7 +60,7 @@ function filter_posts_columns( array $columns ) : array {
 		'title' => __( 'From', 'hm-redirects' ),
 		'to' => __( 'To', 'hm-redirects' ),
 		'status' => __( 'Status', 'hm-redirects' ),
-		'preserve_urls' => __( 'Preserve URL Parameters', 'hm-redirects' ),
+		'preserve_parameters' => __( 'Preserve URL Parameters', 'hm-redirects' ),
 		'date' => __( 'Date' ),
 	];
 
@@ -84,7 +84,7 @@ function posts_columns_content( string $column, int $post_id ) {
 		echo intval( $post->post_content_filtered );
 	}
 
-	if ( $column === 'preserve_urls' ) {
+	if ( $column === 'preserve_parameters' ) {
 		$icon = ( get_post_meta( $post->ID, 'preserve_parameters', true ) ? 'dashicons-yes' : 'dashicons-no' );
 		echo '<span class="dashicons '. $icon .'"></span>';
 	}
@@ -152,7 +152,7 @@ function output_meta_box( WP_Post $post ) {
 	}
 
 	$status_code = ! empty( $post->post_content_filtered ) ? $post->post_content_filtered : $default_status_code;
-	$preserve_url = get_post_meta( $post->ID, 'preserve_parameters', true );
+	$preserve_parameters = get_post_meta( $post->ID, 'preserve_parameters', true );
 
 	?>
 	<p>
@@ -176,7 +176,7 @@ function output_meta_box( WP_Post $post ) {
 		<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'hm-redirects' ); ?></em>
 	</p>
 	<p>
-		<input type="checkbox" name="hm_redirects_parameters" id="hm_redirects_parameters" value="1" <?php echo ( $preserve_url ? 'checked' : ''  );?> />
+		<input type="checkbox" name="hm_redirects_parameters" id="hm_redirects_parameters" value="1" <?php echo ( $preserve_parameters ? 'checked' : ''  );?> />
 		<label for="hm_redirects_parameters"><?php esc_html_e( 'Preserve URL parameters?', 'hm-redirects' ); ?></label>
 	</p>
 	<p class="description"><?php esc_html_e( 'By default, query parameters (e.g. ?utm_campaign=x) will be removed when redirecting. Enable this option to preserve these parameters when redirecting.', 'hm-redirects' ); ?></p>
@@ -215,7 +215,7 @@ function handle_redirect_saving( $post_id ) {
 	);
 	// phpcs:enable
 
-	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $data['preserve'], $post_id );
+	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $data['preserve_parameters'], $post_id );
 
 	return $redirect_id === $post_id;
 }
@@ -235,7 +235,7 @@ function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe
 		'from_url'    => Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $unsafe_from ) ),
 		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
 		'status_code' => absint( $unsafe_status_code ),
-		'preserve'    => $unsafe_preserve_parameters,
+		'preserve_parameters' => $unsafe_preserve_parameters,
 	];
 }
 

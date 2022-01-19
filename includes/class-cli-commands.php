@@ -141,7 +141,7 @@ class CLI_Commands extends WP_CLI_Command {
 		}
 
 		$preserve_parameters = filter_var( $assoc_args['preserve-parameters'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
-		if ( $preserve_parameters === null || ! is_bool( $preserve_parameters ) ){
+		if ( $preserve_parameters === null ){
 			WP_CLI::error( sprintf( 'In order to preserve the parameters in a URL, the value must be a boolean, %s is invalid', $assoc_args['preserve-parameters'] ) );
 		}
 

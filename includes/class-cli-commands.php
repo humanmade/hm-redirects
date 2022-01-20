@@ -230,8 +230,8 @@ class CLI_Commands extends WP_CLI_Command {
 			}
 
 			$redirect = Utilities\insert_redirect(
-				Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $redirect_from ) ),
-				Utilities\sanitise_and_normalise_url( $redirect_to ),
+				$redirect_from,
+				$redirect_to,
 				absint( $status )
 			);
 

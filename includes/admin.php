@@ -193,11 +193,11 @@ function handle_redirect_saving( $post_id ) {
 
 	// phpcs:disable WordPress.VIP.ValidatedSanitizedInput
 	// We're using a custom sanitisation function.
-	$data = sanitise_and_normalise_redirect_data(
-		wp_unslash( $_POST['hm_redirects_from_url'] ),
-		wp_unslash( $_POST['hm_redirects_to_url'] ),
-		wp_unslash( $_POST['hm_redirects_status_code'] )
-	);
+	$data = [
+		'from_url' => wp_unslash( $_POST['hm_redirects_from_url'] ),
+		'to_url' => wp_unslash( $_POST['hm_redirects_to_url'] ),
+		'status_code' => wp_unslash( $_POST['hm_redirects_status_code'] )
+	];
 	// phpcs:enable
 
 	$redirect_id = Utilities\insert_redirect( $data['from_url'], $data['to_url'], $data['status_code'], $post_id );
@@ -215,11 +215,8 @@ function handle_redirect_saving( $post_id ) {
  * @return array
  */
 function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code ) {
-	return [
-		'from_url'    => Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $unsafe_from ) ),
-		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
-		'status_code' => absint( $unsafe_status_code ),
-	];
+	_deprecated_function( __FUNCTION__, '0.6.2', 'HM\\Redirects\\Utilities\\sanitise_and_normalise_redirect_data' );
+	return Utilities\sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code );
 }
 
 /**

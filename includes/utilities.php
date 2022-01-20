@@ -10,6 +10,8 @@ namespace HM\Redirects\Utilities;
 use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 use WP_Error;
 
+const PRESERVED_PARAMS_OPTION = 'hm_redirects_preserved_parameters';
+
 /**
  * Creates an md5 hash from a URL.
  *
@@ -48,10 +50,14 @@ function sanitise_and_normalise_url( $unsafe_url ) {
 	}
 
 	// Remove any parameters and trailing slash from the url.
-	$clean_url = rtrim( strtok( $unsafe_url, '?' ), '/' );
+	if ( ! empty( $url_parts['query'] ) ) {
+		list( $safe_parameters, ) = split_query_parameters( $url_parts['query'] );
+		$unsafe_url = strtok( $unsafe_url, '?' );
+		$unsafe_url = add_query_arg( $safe_parameters, $unsafe_url );
+	}
 
 	// We now can safely escape the URL.
-	$url = esc_url_raw( $clean_url );
+	$url = esc_url_raw( $unsafe_url );
 
 	return $url;
 }
@@ -120,6 +126,23 @@ function prefix_path( $url ) {
 }
 
 /**
+ * Sanitise and normalise data for a redirect post.
+ *
+ * @param string $unsafe_from        From URL.
+ * @param string $unsafe_to          To URL.
+ * @param string $unsafe_status_code HTTP status code.
+ *
+ * @return array
+ */
+function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe_status_code ) {
+	return [
+		'from_url'    => normalise_url( sanitise_and_normalise_url( $unsafe_from ) ),
+		'to_url'      => sanitise_and_normalise_url( $unsafe_to ),
+		'status_code' => absint( $unsafe_status_code ),
+	];
+}
+
+/**
  * Add a redirect.
  *
  * @param string $from        Leading-slashed relative URL to redirect away from.
@@ -153,14 +176,27 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	 */
 	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
 
+	// Parse out query string parameters and add them to the preserved list.
+	wp_parse_str( wp_parse_url( $from, PHP_URL_QUERY ), $query );
+	if ( is_array( $query ) && ! empty( $query ) ) {
+		add_preserved_query_string_parameters( array_keys( $query ) );
+	}
+
+	// Sanitise values before saving to the database..
+	$data = sanitise_and_normalise_redirect_data(
+		$from,
+		$to,
+		$status_code
+	);
+
 	$result = wp_insert_post(
 		[
 			'ID'                    => $post_id,
-			'post_content_filtered' => $status_code,
-			'post_excerpt'          => $to,
-			'post_name'             => get_url_hash( $from ),
+			'post_content_filtered' => $data['status_code'],
+			'post_excerpt'          => $data['to_url'],
+			'post_name'             => get_url_hash( $data['from_url'] ),
 			'post_status'           => 'publish',
-			'post_title'            => strtolower( $from ),
+			'post_title'            => strtolower( $data['from_url'] ),
 			'post_type'             => REDIRECTS_POST_TYPE,
 		],
 		true
@@ -206,4 +242,50 @@ function add_leading_slash( $string ) {
 	$string = ltrim( $string, '\/' );
 
 	return '/' . $string;
+}
+
+/**
+ * Update an option with query parameters that should be preserved for
+ * matching redirects.
+ *
+ * @param array $parameters New query string parameters to add to the preserved list.
+ * @return void
+ */
+function add_preserved_query_string_parameters( array $parameters ) {
+	$existing_parameters = get_preserved_query_parameters();
+	$parameters = array_merge( $existing_parameters, $parameters );
+	$parameters = array_unique( $parameters );
+	$parameters = array_filter( $parameters );
+	update_option( PRESERVED_PARAMS_OPTION, implode( ';', $parameters ) );
+}
+
+/**
+ * Return list of query parameters to preserve.
+ *
+ * @return array
+ */
+function get_preserved_query_parameters() : array {
+	return explode( ';', get_option( PRESERVED_PARAMS_OPTION, '' ) );
+}
+
+/**
+ * Splits query string parameters into preserved and unknown groups.
+ *
+ * Usage: list( $safe, $unknown ) = split_query_parameters( $_SERVER['QUERY_STRING'] );
+ *
+ * @param string $query_string
+ * @return array Array containing 2 associative arrays of preserved and unknown query string parameters.
+ */
+function split_query_parameters( string $query_string ) : array {
+	$preserved_parameters = get_preserved_query_parameters();
+	$preserved_parameters = array_flip( $preserved_parameters );
+	wp_parse_str( $query_string, $query_parameters );
+	$safe_query_parameters = array_intersect_key( $query_parameters, $preserved_parameters );
+	ksort( $safe_query_parameters );
+	$unknown_query_parameters = array_diff_key( $query_parameters, $preserved_parameters );
+
+	return [
+		$safe_query_parameters,
+		$unknown_query_parameters,
+	];
 }

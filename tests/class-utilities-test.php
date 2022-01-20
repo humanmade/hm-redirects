@@ -77,6 +77,8 @@ class Utilities_Test extends WP_UnitTestCase {
 			[ 'only/the/path', '/only/the/path' ],
 			// Relative URL, with query parameter.
 			[ '/a/path/?with=queryparam', '/a/path/?with=queryparam' ],
+			// Ordered query parameters.
+			[ '/a/path/?c=d&a=b', '/a/path/?a=b&c=d' ],
 			// Relative URL, with query parameter using brackets.
 			[ '/a/path/withbrakets?foo[bar]=baz', '/a/path/withbrakets?foo%5Bbar%5D=baz' ],
 			// Relative URL, with encoded spaces.

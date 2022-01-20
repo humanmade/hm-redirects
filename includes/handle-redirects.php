@@ -90,7 +90,8 @@ function get_redirect_uri( $url ) {
 
 	// If there were any query parameters in the original URL, append them to the new URL.
 	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
-		$to_url .= '/?'.$_SERVER['QUERY_STRING'];
+		list( , $unknown_parameters ) = Utilities\split_query_parameters( $_SERVER['QUERY_STRING'] );
+		$to_url = add_query_arg( urlencode_deep( $unknown_parameters ), $to_url );
 	}
 
 	return wp_sanitize_redirect( $to_url );

@@ -33,4 +33,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           image: humanmade/plugin-tester
-          options: -e WP_VERSION=5.8 -v "$PWD:/code"
+          options: -e WP_VERSION=5.8 -v "${{ github.workspace }}:/code"

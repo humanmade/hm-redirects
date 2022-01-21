@@ -27,5 +27,7 @@ jobs:
           fail-fast: true
       - name: Composer install
         run: composer install
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: Plugin Tester
         run: docker run --rm -e WP_VERSION=5.8 -v ${{ github.workspace }}:/code humanmade/plugin-tester

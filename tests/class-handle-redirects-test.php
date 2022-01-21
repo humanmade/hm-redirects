@@ -54,6 +54,10 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 		return [
 			[ '/original-post', '/redirected-post', '/original-post', '/redirected-post', 301 ],
 			[ '/original-post', '/redirected-post', '/original-post?with=query-param', '/redirected-post?with=query-param', 303 ],
+			[ '/original-post', '/redirected-post', '/original-post?with=query-param#hash', '/redirected-post?with=query-param#hash', 303 ],
+			[ '/original-post', '/redirected-post#hash', '/original-post#other-hash', '/redirected-post#hash', 303 ],
+			[ '/original-post', '/redirected-post#hash', '/original-post?with=query-param', '/redirected-post?with=query-param#hash', 303 ],
+			[ '/original-post', '/redirected-post#hash', '/original-post?with=query-param#other-hash', '/redirected-post?with=query-param#hash', 303 ],
 		];
 	}
 

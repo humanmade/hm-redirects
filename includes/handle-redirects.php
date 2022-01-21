@@ -91,7 +91,7 @@ function get_redirect_uri( $url ) {
 
 	// Re-append any existing query string parameters.
 	if ( ! empty( $query_string ) ) {
-		$to_url .= strstr( $to_url, '?' ) ? '&' : '?';
+		$to_url .= strpos( $to_url, '?' ) !== false ? '&' : '?';
 		$to_url .= $query_string;
 	}
 

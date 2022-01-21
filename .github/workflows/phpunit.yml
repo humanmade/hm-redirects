@@ -28,10 +28,4 @@ jobs:
       - name: Composer install
         run: composer install
       - name: Plugin Tester
-        uses: addnab/docker-run-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          image: humanmade/plugin-tester
-          options: -e WP_VERSION=5.8 -v ${{ github.workspace }}:/code
-          run: chmod 755 /entrypoint.sh
+        run: docker run --rm -e WP_VERSION=5.8 -v ${{ github.workspace }}:/code humanmade/plugin-tester

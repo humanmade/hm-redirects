@@ -9,6 +9,7 @@ namespace HM\Redirects\Tests;
 
 use const HM\Redirects\Post_Type\SLUG as REDIRECTS_POST_TYPE;
 use HM\Redirects\Admin_UI;
+use HM\Redirects\Utilities;
 use WP_UnitTestCase;
 
 /**
@@ -37,8 +38,8 @@ class Admin_Test extends WP_UnitTestCase {
 		$this->assertTrue( Admin_UI\handle_redirect_saving( $redirect_post_id ) );
 
 		$saved_data = get_post( $redirect_post_id );
-		$this->assertSame( md5( 'http://example.com/from' ), $saved_data->post_name );
-		$this->assertSame( 'http://example.com/from', $saved_data->post_title );
+		$this->assertSame( Utilities\get_url_hash( '/from' ), $saved_data->post_name );
+		$this->assertSame( '/from', $saved_data->post_title );
 		$this->assertSame( 'http://example.com/to', $saved_data->post_excerpt );
 		$this->assertSame( '403', $saved_data->post_content_filtered );
 	}

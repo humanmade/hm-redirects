@@ -73,6 +73,7 @@ function maybe_do_redirect() {
  * @return false|string Redirect-sanitised URL, or false if no valid redirect matched.
  */
 function get_redirect_uri( $url ) {
+	$url_parts = wp_parse_url( $url );
 	$url = Utilities\sanitise_and_normalise_url( $url );
 
 	$redirect_post = get_redirect_post( $url );
@@ -87,6 +88,17 @@ function get_redirect_uri( $url ) {
 
 	// If the URL is only a path, prefix it with the `home_url()`.
 	$to_url = Utilities\prefix_path( $to_url );
+
+	// Re-append any existing query string parameters.
+	if ( ! empty( $url_parts['query'] ) ) {
+		$to_url = explode( '#', $to_url );
+		$to_url[0] .= strpos( $to_url[0], '?' ) !== false ? '&' : '?';
+		$to_url[0] .= $url_parts['query'];
+		$to_url = implode( '#', array_filter( $to_url ) );
+	}
+	if ( ! empty( $url_parts['fragment'] ) && strpos( $to_url, '#' ) === false ) {
+		$to_url .= '#' . $url_parts['fragment'];
+	}
 
 	return wp_sanitize_redirect( $to_url );
 }

@@ -21,7 +21,7 @@ jobs:
         with:
           php-version: '7.4'
           tools: composer:v2
-          extensions: ext-zip
+          extensions: zip
         env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           fail-fast: true

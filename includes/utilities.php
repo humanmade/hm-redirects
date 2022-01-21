@@ -150,13 +150,17 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	 */
 	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
 
+	// When adding posts via the admin there is already a post object so we
+	// need to preserve its status.
+	$post = get_post( $post_id );
+
 	$result = wp_insert_post(
 		[
 			'ID'                    => $post_id,
 			'post_content_filtered' => $status_code,
 			'post_excerpt'          => $to,
 			'post_name'             => get_url_hash( $from ),
-			'post_status'           => 'publish',
+			'post_status'           => $post->post_status ?? 'publish',
 			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
 		],

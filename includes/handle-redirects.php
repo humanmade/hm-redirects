@@ -91,7 +91,8 @@ function get_redirect_uri( $url ) {
 
 	// Re-append any existing query string parameters.
 	if ( ! empty( $query_string ) ) {
-		$to_url .= "?{$query_string}";
+		$to_url .= strstr( $to_url, '?' ) ? '&' : '?';
+		$to_url .= $query_string;
 	}
 
 	return wp_sanitize_redirect( $to_url );

@@ -52,8 +52,8 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 	 */
 	public function provider_redirect_uri_valid() {
 		return [
-			[ '/original-post', '/redirected-post', 301 ],
-			[ '/original-post?with=query-param', '/redirected-post?with=query-param', 303 ],
+			[ '/original-post', '/redirected-post', '/original-post', '/redirected-post', 301 ],
+			[ '/original-post', '/redirected-post', '/original-post?with=query-param', '/redirected-post?with=query-param', 303 ],
 		];
 	}
 
@@ -83,21 +83,23 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider provider_redirect_uri_valid
 	 *
-	 * @param string $original_url Original URL.
+	 * @param string $from Redirect from.
+	 * @param string $to Redirect to.
+	 * @param string $request_url Original URL.
 	 * @param string $expected_result Expected result.
 	 */
-	public function test_get_redirect_uri_valid_urls( $original_url, $expected_result ) {
+	public function test_get_redirect_uri_valid_urls( $from, $to, $request_url, $expected_result ) {
 
 		$p = $this->factory->post->create(
 			[
 				'post_title'   => 'Test Post',
-				'post_name'    => md5( $original_url ),
+				'post_name'    => md5( $from ),
 				'post_type'    => Redirects_Post_Type\SLUG,
-				'post_excerpt' => $expected_result,
+				'post_excerpt' => $to,
 			]
 		);
 
-		$result = Handle_Redirects\get_redirect_uri( $original_url );
+		$result = Handle_Redirects\get_redirect_uri( $request_url );
 		$this->assertEquals( home_url() . $expected_result, $result );
 
 		wp_delete_post( $p );

@@ -47,11 +47,12 @@ function sanitise_and_normalise_url( $unsafe_url ) {
 		$unsafe_url = add_leading_slash( $unsafe_url );
 	}
 
-	// Remove any parameters and trailing slash from the url.
-	$clean_url = rtrim( strtok( $unsafe_url, '?' ), '/' );
+	// Strip query string, hash location and trailing slash.
+	$unsafe_url = strtok( $unsafe_url, '?#' );
+	$unsafe_url = rtrim( $unsafe_url, '/' );
 
 	// We now can safely escape the URL.
-	$url = esc_url_raw( $clean_url );
+	$url = esc_url_raw( $unsafe_url );
 
 	return $url;
 }
@@ -157,13 +158,17 @@ function insert_redirect( $from, $to, $status_code, bool $preserve_parameters = 
 	 */
 	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $preserve_parameters, $post_id );
 
+	// When adding posts via the admin there is already a post object so we
+	// need to preserve its status.
+	$post = get_post( $post_id );
+
 	$result = wp_insert_post(
 		[
 			'ID'                    => $post_id,
 			'post_content_filtered' => $status_code,
 			'post_excerpt'          => $to,
 			'post_name'             => get_url_hash( $from ),
-			'post_status'           => 'publish',
+			'post_status'           => $post->post_status ?? 'publish',
 			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
 			'meta_input' => [

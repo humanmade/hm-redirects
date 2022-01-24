@@ -106,14 +106,14 @@ class CLI_Commands extends WP_CLI_Command {
 	 * default: 302
 	 * ---
 	 *
-	 * [--preserve-parameters=<preserve>]
+	 * [--preserve-parameters]
 	 * : Preserve URL parameters.
 	 * ---
 	 * default: 0
 	 * ---
 	 *
 	 * @subcommand insert-redirect
-	 * @synopsis <from_url_relative> <to_url_absolute> [--code=<code>] [--preserve-parameters=<preserve>]
+	 * @synopsis <from_url_relative> <to_url_absolute> [--code=<code>] [--preserve-parameters]
 	 *
 	 * @param string[] $args Positional arguments.
 	 * @param string[] $assoc_args Not used.

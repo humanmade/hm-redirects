@@ -47,7 +47,7 @@ function sanitise_and_normalise_url( $unsafe_url ) {
 		$unsafe_url = add_leading_slash( $unsafe_url );
 	}
 
-	// remove any parameters and trailing slash from the url.
+	// Remove any parameters and trailing slash from the url.
 	$clean_url = rtrim( strtok( $unsafe_url, '?' ), '/' );
 
 	// We now can safely escape the URL.

@@ -211,7 +211,7 @@ function handle_redirect_saving( $post_id ) {
 		wp_unslash( $_POST['hm_redirects_from_url'] ),
 		wp_unslash( $_POST['hm_redirects_to_url'] ),
 		wp_unslash( $_POST['hm_redirects_status_code'] ),
-		wp_unslash( isset( $_POST['hm_redirects_parameters'] ) ?: '' ),
+		isset( $_POST['hm_redirects_parameters'] ) ?: '',
 	);
 	// phpcs:enable
 

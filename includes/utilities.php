@@ -141,6 +141,7 @@ function insert_redirect( $from, $to, $status_code, bool $preserve_parameters = 
 	 * @param string $from The URL to redirect from.
 	 * @param string $to The URL to redirect to.
 	 * @param int $status_code The status code for the redirect.
+	 * @param bool $preserve_parameters Preserver URL Parameters.
 	 * @param int $post_id The post ID for the redirect.
 	 */
 	$from = apply_filters( 'hm_redirects_pre_save_from_url', $from, $to, $status_code, $post_id );
@@ -151,11 +152,10 @@ function insert_redirect( $from, $to, $status_code, bool $preserve_parameters = 
 	 * @param string $to The URL to redirect to.
 	 * @param string $from The URL to redirect to.
 	 * @param int $status_code The status code for the redirect.
+	 * @param bool $preserve_parameters Preserver URL Parameters.
 	 * @param int $post_id The post ID for the redirect.
 	 */
 	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
-
-	$preserve_parameters = filter_var( $preserve_parameters, FILTER_VALIDATE_BOOLEAN );
 
 	$result = wp_insert_post(
 		[

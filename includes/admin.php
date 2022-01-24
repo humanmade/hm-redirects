@@ -235,7 +235,7 @@ function sanitise_and_normalise_redirect_data( $unsafe_from, $unsafe_to, $unsafe
 		'from_url'    => Utilities\normalise_url( Utilities\sanitise_and_normalise_url( $unsafe_from ) ),
 		'to_url'      => Utilities\sanitise_and_normalise_url( $unsafe_to ),
 		'status_code' => absint( $unsafe_status_code ),
-		'preserve_parameters' => $unsafe_preserve_parameters,
+		'preserve_parameters' => filter_var( $unsafe_preserve_parameters, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
 	];
 }
 

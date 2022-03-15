@@ -91,7 +91,7 @@ function posts_columns_content( string $column, int $post_id ) {
  * @param WP_Post $post Current row post.
  */
 function row_actions( $actions, $post ) {
-	if ( $post->post_status === 'trash' ) {
+	if ( $post->post_status === 'trash' || $post->post_type !== Redirects_Post_Type\SLUG ) {
 		return $actions;
 	}
 

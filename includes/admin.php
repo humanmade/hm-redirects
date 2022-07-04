@@ -102,7 +102,7 @@ function row_actions( $actions, $post ) {
 		[
 			'visit' => sprintf(
 				'<a target="_blank" href="%s" aria-label="%s">%s</a>',
-				esc_url( $url ),
+				esc_url( home_url( $url ) ),
 				$aria_label,
 				esc_html__( 'Visit', 'hm-redirects' )
 			),

@@ -30,7 +30,7 @@ function maybe_do_redirect() {
 		return false;
 	}
 
-	$path = untrailingslashit( str_replace( wp_parse_url( home_url(), PHP_URL_PATH ), '', wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+	$path = untrailingslashit( str_replace( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '', wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 
 	/**
 	 * Filter the request path before searching for a matching redirect.

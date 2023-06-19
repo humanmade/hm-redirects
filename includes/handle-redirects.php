@@ -86,6 +86,11 @@ function get_redirect_uri( $url ) {
 		return false;
 	}
 
+  if ($to_url[0] === '/') {
+    // It's a local URL. WordPress
+    $to_url = trailingslashit($to_url);
+  }
+
 	// If the URL is only a path, prefix it with the `home_url()`.
 	$to_url = Utilities\prefix_path( $to_url );
 

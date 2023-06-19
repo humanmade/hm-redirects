@@ -98,6 +98,8 @@ function row_actions( $actions, $post ) {
 	$url = get_the_title( $post );
 	/* translators: %s: Redirect source URL */
 	$aria_label = esc_html( sprintf( __( 'Visit %s', 'hm-redirects' ), $url ) );
+
+	unset($actions['inline hide-if-no-js']);
 	return array_merge(
 		[
 			'visit' => sprintf(

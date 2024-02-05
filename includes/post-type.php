@@ -49,6 +49,7 @@ function register_post_type() {
 			'show_in_menu'        => true,
 			'menu_position'       => 75,
 			'menu_icon'           => 'dashicons-migrate',
+			'capability_type'     => SLUG,
 			'show_in_admin_bar'   => true,
 			'show_in_nav_menus'   => false,
 			'can_export'          => true,

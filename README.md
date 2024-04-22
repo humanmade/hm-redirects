@@ -15,3 +15,16 @@ One way to get a list of redirect target domains is to run the WP-CLI command: `
 
 ## Attributions
 Props for the data storage approach to VIP's [WPCOM Legacy Redirector](https://github.com/Automattic/WPCOM-Legacy-Redirector).
+
+## Contributing
+
+### Before tagging a release
+
+* Update the [version string on line 8](hm-redirects.php).
+
+### Running tests
+Currently the plugin's automated tests [run against PHP 7.4 and WP 5.8](.github/workflows/phpunit.yml). PHPUnit doesn't need to be installed, however:
+```
+composer install
+docker run --rm -e WP_VERSION=5.8 -v $PWD:/code humanmade/plugin-tester
+```

@@ -47,9 +47,15 @@ function sanitise_and_normalise_url( $unsafe_url ) {
 		$unsafe_url = add_leading_slash( $unsafe_url );
 	}
 
+	// Preserve trailing slash if it exists.
+	$has_trailing_slash = substr( $unsafe_url, -1 ) === '/';
+	if ( $has_trailing_slash ) {
+		// If the input URL has 1+ trailing slashes, we preserve exactly one.
+		$unsafe_url = trailingslashit( $unsafe_url );
+	}
+
 	// Strip query string, hash location and trailing slash.
 	$unsafe_url = strtok( $unsafe_url, '?#' );
-	$unsafe_url = rtrim( $unsafe_url, '/' );
 
 	// We now can safely escape the URL.
 	$url = esc_url_raw( $unsafe_url );

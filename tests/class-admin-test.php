@@ -34,13 +34,13 @@ class Admin_Test extends WP_UnitTestCase {
 		// All data set.
 		$_POST['hm_redirects_from_url']    = 'http://example.com/from';
 		$_POST['hm_redirects_to_url']      = 'http://example.com/to';
-		$_POST['hm_redirects_status_code'] = '403';
+		$_POST['hm_redirects_status_code'] = '301';
 		$this->assertTrue( Admin_UI\handle_redirect_saving( $redirect_post_id ) );
 
 		$saved_data = get_post( $redirect_post_id );
 		$this->assertSame( Utilities\get_url_hash( '/from' ), $saved_data->post_name );
 		$this->assertSame( '/from', $saved_data->post_title );
 		$this->assertSame( 'http://example.com/to', $saved_data->post_excerpt );
-		$this->assertSame( '403', $saved_data->post_content_filtered );
+		$this->assertSame( '301', $saved_data->post_content_filtered );
 	}
 }

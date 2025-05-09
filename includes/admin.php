@@ -120,7 +120,7 @@ function output_meta_box( WP_Post $post ) {
 	$valid_status_codes = [ 301, 302, 303, 307, ];
 	$status_code_labels = [
 		301 => 'Moved Permanently',
-		302 => 'Found',
+		302 => 'Found (Moved temporarily)',
 		303 => 'See Other',
 		307 => 'Temporary Redirect',
 	];

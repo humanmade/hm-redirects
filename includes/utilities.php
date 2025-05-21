@@ -132,11 +132,13 @@ function prefix_path( $url ) {
  * @param string $from        Leading-slashed relative URL to redirect away from.
  * @param string $to          Absolute URL to redirect to.
  * @param int    $status_code HTTP status code for the redirect.
+ * @param bool   $preserve_parameters	Optional. Preserve URL parameters.
  * @param int    $post_id     Optional. If set, update that existing redirect.
  *
  * @return int|\WP_Error The post ID if redirect added, otherwise WP_Error on failure.
  */
-function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
+function insert_redirect( $from, $to, $status_code, bool $preserve_parameters = false, $post_id = 0 ) {
+
 	// Stop loops.
 	remove_action( 'save_post', 'HM\Redirects\\Admin_UI\\handle_redirect_saving', 13 );
 
@@ -146,9 +148,10 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	 * @param string $from The URL to redirect from.
 	 * @param string $to The URL to redirect to.
 	 * @param int $status_code The status code for the redirect.
+	 * @param bool $preserve_parameters Preserver URL Parameters.
 	 * @param int $post_id The post ID for the redirect.
 	 */
-	$from = apply_filters( 'hm_redirects_pre_save_from_url', $from, $to, $status_code, $post_id );
+	$from = apply_filters( 'hm_redirects_pre_save_from_url', $from, $to, $status_code, $preserve_parameters, $post_id );
 
 	/**
 	 * Filter the to URL value before saving to the database.
@@ -156,9 +159,10 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 	 * @param string $to The URL to redirect to.
 	 * @param string $from The URL to redirect to.
 	 * @param int $status_code The status code for the redirect.
+	 * @param bool $preserve_parameters Preserver URL Parameters.
 	 * @param int $post_id The post ID for the redirect.
 	 */
-	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $post_id );
+	$to = apply_filters( 'hm_redirects_pre_save_to_url', $to, $from, $status_code, $preserve_parameters, $post_id );
 
 	// When adding posts via the admin there is already a post object so we
 	// need to preserve its status.
@@ -173,6 +177,9 @@ function insert_redirect( $from, $to, $status_code, $post_id = 0 ) {
 			'post_status'           => $post->post_status ?? 'publish',
 			'post_title'            => strtolower( $from ),
 			'post_type'             => REDIRECTS_POST_TYPE,
+			'meta_input' => [
+				'preserve_parameters' => $preserve_parameters,
+			]
 		],
 		true
 	);

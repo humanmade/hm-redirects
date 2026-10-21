@@ -116,12 +116,9 @@ function get_redirect_status_code( $url = '' ) {
 		return new WP_Error( '', 'URL needs to be a non empty string' );
 	}
 
-	$url = Utilities\normalise_url( $url );
-	if ( is_wp_error( $url ) ) {
-		return 302;
-	}
-
-	$redirect_post = get_redirect_post( $url );
+	// Look the redirect up the same way get_redirect_uri() does, so a request with a
+	// query string or encoded characters gets the stored status code.
+	$redirect_post = get_redirect_post( Utilities\sanitise_and_normalise_url( $url ) );
 
 	if ( ! is_null( $redirect_post ) ) {
 		$status_code = $redirect_post->post_content_filtered;

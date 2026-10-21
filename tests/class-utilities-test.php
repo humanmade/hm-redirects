@@ -47,6 +47,9 @@ class Utilities_Test extends WP_UnitTestCase {
 			[ '/a/path/withbrakets?foo[bar]=baz', '/a/path/withbrakets?foo[bar]=baz' ],
 			// Relative URL, with encoded spaces.
 			[ '/Mr%20%20WordPress', '/Mr%20%20WordPress' ],
+			// Multibyte characters whose UTF-8 bytes include 0x80-0x9F.
+			[ '/channel-5-–-the-runt’s-corner…', '/channel-5-–-the-runt’s-corner…' ],
+			[ '/の国際線の受託手荷物?の=と', '/の国際線の受託手荷物?の=と' ],
 		];
 	}
 

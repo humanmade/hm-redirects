@@ -138,4 +138,43 @@ class Handle_Redirects_Test extends WP_UnitTestCase {
 
 		wp_delete_post( $p );
 	}
+
+	/**
+	 * Provides requests that should get the stored status code.
+	 *
+	 * @return array
+	 */
+	public function provider_status_code_requests() {
+		return [
+			'plain path'         => [ '/original-post', '/original-post' ],
+			'query string'       => [ '/original-post', '/original-post?utm_source=newsletter' ],
+			'encoded characters' => [ '/café-–-menu', '/caf%C3%A9-%E2%80%93-menu' ],
+			'raw multibyte'      => [ '/café-–-menu', '/café-–-menu' ],
+		];
+	}
+
+	/**
+	 * Tests that get_redirect_status_code() finds the same redirect as get_redirect_uri().
+	 *
+	 * @dataProvider provider_status_code_requests
+	 *
+	 * @param string $from    Redirect from, as stored.
+	 * @param string $request Request path.
+	 */
+	public function test_get_redirect_status_code_matches_redirect_lookup( $from, $request ) {
+		$p = $this->factory->post->create(
+			[
+				'post_title'            => $from,
+				'post_name'             => md5( strtolower( $from ) ),
+				'post_type'             => Redirects_Post_Type\SLUG,
+				'post_excerpt'          => '/redirected-post',
+				'post_content_filtered' => 301,
+			]
+		);
+
+		$this->assertNotFalse( Handle_Redirects\get_redirect_uri( $request ) );
+		$this->assertEquals( 301, Handle_Redirects\get_redirect_status_code( $request ) );
+
+		wp_delete_post( $p );
+	}
 }

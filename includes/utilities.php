@@ -78,8 +78,18 @@ function normalise_url( $url ) {
 		return new WP_Error( 'invalid-redirect-url', esc_html__( 'The URL does not validate', 'hm-redirects' ) );
 	}
 
+	// On some platforms (e.g. macOS) parse_url() replaces bytes 0x80-0x9F with "_",
+	// breaking multibyte characters. Parse a percent-encoded copy, decode afterwards.
+	$encoded = preg_replace_callback(
+		'/[\x80-\xff]/',
+		function ( $matches ) {
+			return rawurlencode( $matches[0] );
+		},
+		str_replace( '%', '%25', $url )
+	);
+
 	// Break up the URL into it's constituent parts.
-	$components = wp_parse_url( $url );
+	$components = wp_parse_url( $encoded );
 
 	// Avoid playing with unexpected data.
 	if ( ! is_array( $components ) ) {
@@ -93,6 +103,9 @@ function normalise_url( $url ) {
 
 	// Make sure $components['query'] is set, to avoid errors.
 	$components['query'] = ( isset( $components['query'] ) ) ? $components['query'] : '';
+
+	$components['path']  = isset( $components['path'] ) ? rawurldecode( $components['path'] ) : '';
+	$components['query'] = rawurldecode( $components['query'] );
 
 	// All we want is path and query strings.
 	// Note this strips hashes (#) too.
